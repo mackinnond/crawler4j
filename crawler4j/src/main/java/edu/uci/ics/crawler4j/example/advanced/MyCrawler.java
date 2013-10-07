@@ -25,57 +25,144 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 
-public class MyCrawler extends WebCrawler {
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MyCrawler.
+ */
+public class MyCrawler extends WebCrawler
+{
+	private String baseUrl;
+	
+	/** The Constant FILTERS. */
+	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|doc|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4"
+			+ "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 
-	Pattern filters = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g"
-			+ "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf"
-			+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-
+	/** The my crawl stat. */
 	CrawlStat myCrawlStat;
 
-	public MyCrawler() {
+	/**
+	 * Instantiates a new my crawler.
+	 */
+	public MyCrawler()
+	{
 		myCrawlStat = new CrawlStat();
 	}
 
-	public boolean shouldVisit(WebURL url) {
+	/* (non-Javadoc)
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#shouldVisit(edu.uci.ics.crawler4j.url.WebURL)
+	 */
+	public boolean shouldVisit(WebURL url)
+	{
+		/*
 		String href = url.getURL().toLowerCase();
-		if (filters.matcher(href).matches()) {
+		if (filters.matcher(href).matches())
+		{
 			return false;
 		}
-		if (href.startsWith("http://www.ics.uci.edu/")) {
+		if (href.startsWith("http://www.ics.uci.edu/"))
+		{
 			return true;
 		}
 		return false;
+		
+		*/
+		
+		String href = url.getURL().toLowerCase();
+
+		// Save base Url and check that we have not left site...
+		if (baseUrl == null)
+		{
+			int lastPos = href.indexOf("//") + 2;
+			lastPos = href.indexOf("/", lastPos);
+			baseUrl = href.substring(0, lastPos);
+		}
+
+		if (!href.startsWith(baseUrl))
+		{
+			System.out.println("Excluded external site  : " + href);
+			return false;
+		}
+
+		if (FILTERS.matcher(href).matches())
+		{
+			System.out.println("Exclude : " + href);
+			return false;
+		}
+		if (href.contains(".ico"))
+		{
+			System.out.println("Exclude : " + href);
+			return false;
+		}
+		else if (href.contains(".css"))
+		{
+			System.out.println("Exclude : " + href);
+			return false;
+		}
+		System.out.println("Include : " + href);
+		return true;
 	}
-	
-	public void visit(Page page) {	
+
+	/* (non-Javadoc)
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#visit(edu.uci.ics.crawler4j.crawler.Page)
+	 */
+	public void visit(Page page)
+	{
 		myCrawlStat.incProcessedPages();
-		List<WebURL> links = page.getURLs();		
+
+		int docid = page.getWebURL().getDocid();
+		String url = page.getWebURL().getURL();
+		int parentDocid = page.getWebURL().getParentDocid();
+		System.out.println("Docid: " + docid);
+		System.out.println("URL: " + url);
+		System.out.println("Docid of parent page: " + parentDocid);
+		String text = page.getText();
+		String html = page.getHTML();
+
+		myCrawlStat.getTextBuff().append(text + " ");
+		myCrawlStat.getTextBuff().append("\n =================== ");
+
+		List<WebURL> links = page.getURLs();
 		myCrawlStat.incTotalLinks(links.size());
-		try {
+		try
+		{
 			myCrawlStat.incTotalTextSize(page.getText().getBytes("UTF-8").length);
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e)
+		{
 		}
 		// We dump this crawler statistics after processing every 50 pages
-		if (myCrawlStat.getTotalProcessedPages() % 50 == 0) {
+		if (myCrawlStat.getTotalProcessedPages() % 50 == 0)
+		{
 			dumpMyData();
 		}
-	}	
-	
+	}
+
 	// This function is called by controller to get the local data of this crawler when job is finished
-	public Object getMyLocalData() {
+	/* (non-Javadoc)
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#getMyLocalData()
+	 */
+	public Object getMyLocalData()
+	{
 		return myCrawlStat;
 	}
-	
+
 	// This function is called by controller before finishing the job.
 	// You can put whatever stuff you need here.
-	public void onBeforeExit() {
+	/* (non-Javadoc)
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#onBeforeExit()
+	 */
+	public void onBeforeExit()
+	{
 		dumpMyData();
 	}
-	
-	public void dumpMyData() {
+
+	/**
+	 * Dump my data.
+	 */
+	public void dumpMyData()
+	{
 		int myId = getMyId();
-		// This is just an example. Therefore I print on screen. You may probably want to write in a text file. 
+		// This is just an example. Therefore I print on screen. You may probably want to write in a text file.
 		System.out.println("Crawler " + myId + "> Processed Pages: " + myCrawlStat.getTotalProcessedPages());
 		System.out.println("Crawler " + myId + "> Total Links Found: " + myCrawlStat.getTotalLinks());
 		System.out.println("Crawler " + myId + "> Total Text Size: " + myCrawlStat.getTotalTextSize());

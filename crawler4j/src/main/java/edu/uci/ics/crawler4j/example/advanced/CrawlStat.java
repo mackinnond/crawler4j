@@ -17,46 +17,71 @@
 
 package edu.uci.ics.crawler4j.example.advanced;
 
-public class CrawlStat {
+public class CrawlStat
+{
 	private int totalProcessedPages;
 	private long totalLinks;
 	private long totalTextSize;
+	private StringBuilder textBuff;
 
-	
-	public int getTotalProcessedPages() {
+	public CrawlStat()
+	{
+		textBuff = new StringBuilder(1024);
+	}
+
+	public int getTotalProcessedPages()
+	{
 		return totalProcessedPages;
 	}
 
-	public void setTotalProcessedPages(int totalProcessedPages) {
+	public void setTotalProcessedPages(int totalProcessedPages)
+	{
 		this.totalProcessedPages = totalProcessedPages;
 	}
-	
-	public void incProcessedPages() {
+
+	public void incProcessedPages()
+	{
 		this.totalProcessedPages++;
 	}
 
-	public long getTotalLinks() {
+	public long getTotalLinks()
+	{
 		return totalLinks;
 	}
 
-	public void setTotalLinks(long totalLinks) {
+	public void setTotalLinks(long totalLinks)
+	{
 		this.totalLinks = totalLinks;
 	}
 
-	public long getTotalTextSize() {
+	public long getTotalTextSize()
+	{
 		return totalTextSize;
 	}
 
-	public void setTotalTextSize(long totalTextSize) {
+	public void setTotalTextSize(long totalTextSize)
+	{
 		this.totalTextSize = totalTextSize;
 	}
-	
-	public void incTotalLinks(int count) {
+
+	public void incTotalLinks(int count)
+	{
 		this.totalLinks += count;
 	}
-	
-	public void incTotalTextSize(int count) {
+
+	public void incTotalTextSize(int count)
+	{
 		this.totalTextSize += count;
+	}
+
+	public StringBuilder getTextBuff()
+	{
+		return textBuff;
+	}
+
+	public void setTextBuff(StringBuilder textBuff)
+	{
+		this.textBuff = textBuff;
 	}
 
 }

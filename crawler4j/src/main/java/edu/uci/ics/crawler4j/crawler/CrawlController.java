@@ -39,7 +39,7 @@ import edu.uci.ics.crawler4j.util.IO;
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public final class CrawlController {
+public class CrawlController {
 
 	private static final Logger logger = Logger.getLogger(CrawlController.class.getName());
 

@@ -10,7 +10,7 @@
 	<name>crawler4j</name>
 	<version>1.0.0</version>
 	<build>
-		<finalName>zbz_crawlerforj</finalName>
+		<finalName>crawler4j</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
