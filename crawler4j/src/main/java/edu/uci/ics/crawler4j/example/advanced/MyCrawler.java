@@ -60,6 +60,16 @@ public class MyCrawler extends WebCrawler
 		 * (href.startsWith("http://www.ics.uci.edu/")) { return true; } return false;
 		 */
 
+		if (url == null)
+		{
+			return false;
+		}
+
+		if (url.getURL() == null)
+		{
+			return false;
+		}
+
 		String href = url.getURL().toLowerCase();
 
 		// Save base Url and check that we have not left site...
@@ -67,7 +77,14 @@ public class MyCrawler extends WebCrawler
 		{
 			int lastPos = href.indexOf("//") + 2;
 			lastPos = href.indexOf("/", lastPos);
-			baseUrl = href.substring(0, lastPos);
+			if (lastPos == -1)
+			{
+				baseUrl = href; 
+			}
+			else
+			{
+				baseUrl = href.substring(0, lastPos);
+			}
 		}
 
 		if (!href.startsWith(baseUrl))
@@ -102,18 +119,17 @@ public class MyCrawler extends WebCrawler
 	 */
 	public void visit(Page page)
 	{
-		System.out.println("visit() page = " + page.getWebURL());
+		System.out.println("visit()");
 
 		myCrawlStat.incProcessedPages();
 
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();
 		int parentDocid = page.getWebURL().getParentDocid();
-		System.out.println("Docid: " + docid);
-		System.out.println("URL: " + url);
-		System.out.println("Docid of parent page: " + parentDocid);
+		System.out.println("\t Docid: " + docid);
+		System.out.println("\t URL: " + url);
+		System.out.println("\t Docid of parent page: " + parentDocid);
 		String text = page.getText();
-		System.out.println("\t Extracted text size = " + text.toString());
 
 		String html = page.getHTML();
 

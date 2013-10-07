@@ -36,42 +36,12 @@ public class CrawlerTest
 	}
 
 	@Test
-	public void test2()
-	{
-
-		try
-		{
-			int numberOfCrawlers = 10;
-
-			CrawlController controller = new CrawlController("c://temp");
-			controller.addSeed("http://www.ics.uci.edu/");
-			controller.start(MyCrawler.class, numberOfCrawlers);
-
-			List<Object> crawlersLocalData = controller.getCrawlersLocalData();
-			long totalLinks = 0;
-			long totalTextSize = 0;
-			int totalProcessedPages = 0;
-			for (Object localData : crawlersLocalData)
-			{
-				CrawlStat stat = (CrawlStat) localData;
-				totalLinks += stat.getTotalLinks();
-				totalTextSize += stat.getTotalTextSize();
-				totalProcessedPages += stat.getTotalProcessedPages();
-			}
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@Test
 	public void test()
 	{
 		//String baseUrl = "http://www.fiat.co.uk/‎";
 		//String baseUrl = "http://www.zangbezang.com/";
-		String baseUrl = "http://www.empowered-systems.com/";
+		//String baseUrl = "http://www.empowered-systems.com/";
+		String baseUrl = "http://www.citroen.co.uk/";
 		int maxDepth = 10;
 		int maxPagesToFetch = 100;
 		int numberOfCrawlers = 10;
