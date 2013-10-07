@@ -32,10 +32,10 @@ import edu.uci.ics.crawler4j.url.WebURL;
 public class MyCrawler extends WebCrawler
 {
 	private String baseUrl;
-	
+
 	/** The Constant FILTERS. */
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|doc|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4"
-			+ "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|doc|js|bmp|gif|jpe?g"
+			+ "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 
 	/** The my crawl stat. */
 	CrawlStat myCrawlStat;
@@ -48,25 +48,18 @@ public class MyCrawler extends WebCrawler
 		myCrawlStat = new CrawlStat();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#shouldVisit(edu.uci.ics.crawler4j.url.WebURL)
 	 */
 	public boolean shouldVisit(WebURL url)
 	{
 		/*
-		String href = url.getURL().toLowerCase();
-		if (filters.matcher(href).matches())
-		{
-			return false;
-		}
-		if (href.startsWith("http://www.ics.uci.edu/"))
-		{
-			return true;
-		}
-		return false;
-		
-		*/
-		
+		 * String href = url.getURL().toLowerCase(); if (filters.matcher(href).matches()) { return false; } if
+		 * (href.startsWith("http://www.ics.uci.edu/")) { return true; } return false;
+		 */
+
 		String href = url.getURL().toLowerCase();
 
 		// Save base Url and check that we have not left site...
@@ -102,11 +95,15 @@ public class MyCrawler extends WebCrawler
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#visit(edu.uci.ics.crawler4j.crawler.Page)
 	 */
 	public void visit(Page page)
 	{
+		System.out.println("visit() page = " + page.getWebURL());
+
 		myCrawlStat.incProcessedPages();
 
 		int docid = page.getWebURL().getDocid();
@@ -116,6 +113,8 @@ public class MyCrawler extends WebCrawler
 		System.out.println("URL: " + url);
 		System.out.println("Docid of parent page: " + parentDocid);
 		String text = page.getText();
+		System.out.println("\t Extracted text size = " + text.toString());
+
 		String html = page.getHTML();
 
 		myCrawlStat.getTextBuff().append(text + "\n ");
@@ -138,7 +137,9 @@ public class MyCrawler extends WebCrawler
 	}
 
 	// This function is called by controller to get the local data of this crawler when job is finished
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#getMyLocalData()
 	 */
 	public Object getMyLocalData()
@@ -148,7 +149,9 @@ public class MyCrawler extends WebCrawler
 
 	// This function is called by controller before finishing the job.
 	// You can put whatever stuff you need here.
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#onBeforeExit()
 	 */
 	public void onBeforeExit()
