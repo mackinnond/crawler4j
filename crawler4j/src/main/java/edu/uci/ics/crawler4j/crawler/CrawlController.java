@@ -18,7 +18,6 @@
 package edu.uci.ics.crawler4j.crawler;
 
 import java.io.File;
-
 import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,7 @@ import org.apache.log4j.Logger;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 
+import edu.uci.ics.crawler4j.example.advanced.CrawlStat;
 import edu.uci.ics.crawler4j.frontier.DocIDServer;
 import edu.uci.ics.crawler4j.frontier.Frontier;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;

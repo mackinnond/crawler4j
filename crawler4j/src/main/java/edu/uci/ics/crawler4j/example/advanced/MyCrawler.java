@@ -118,8 +118,8 @@ public class MyCrawler extends WebCrawler
 		String text = page.getText();
 		String html = page.getHTML();
 
-		myCrawlStat.getTextBuff().append(text + " ");
-		myCrawlStat.getTextBuff().append("\n =================== ");
+		myCrawlStat.getTextBuff().append(text + "\n ");
+		myCrawlStat.getTextBuff().append("========\n ");
 
 		List<WebURL> links = page.getURLs();
 		myCrawlStat.incTotalLinks(links.size());
