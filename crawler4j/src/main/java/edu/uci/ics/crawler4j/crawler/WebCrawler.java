@@ -31,7 +31,8 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public class WebCrawler implements Runnable {
+public class WebCrawler implements Runnable
+{
 
 	private static final Logger logger = Logger.getLogger(WebCrawler.class.getName());
 
@@ -46,63 +47,85 @@ public class WebCrawler implements Runnable {
 	private CrawlController myController;
 
 	private static short MAX_CRAWL_DEPTH = Configurations.getShortProperty("crawler.max_depth", (short) -1);
-	private static boolean IGNORE_BINARY_CONTENT = !Configurations.getBooleanProperty("crawler.include_binary_content", false);
+	private static boolean IGNORE_BINARY_CONTENT = !Configurations.getBooleanProperty("crawler.include_binary_content",
+			false);
 	private static final boolean FOLLOW_REDIRECTS = Configurations.getBooleanProperty("fetcher.follow_redirects", true);
 
-	public CrawlController getMyController() {
+	public CrawlController getMyController()
+	{
 		return myController;
 	}
 
-	public void setMyController(CrawlController myController) {
+	public void setMyController(CrawlController myController)
+	{
 		this.myController = myController;
 	}
 
-	public WebCrawler() {
+	public WebCrawler()
+	{
 		htmlParser = new HTMLParser();
 	}
 
-	public WebCrawler(int myid) {
+	public WebCrawler(int myid)
+	{
 		this.myid = myid;
 	}
 
-	public void setMyId(int myid) {
+	public void setMyId(int myid)
+	{
 		this.myid = myid;
 	}
 
-	public int getMyId() {
+	public int getMyId()
+	{
 		return myid;
 	}
 
-	public void onStart() {
+	public void onStart()
+	{
 
 	}
 
-	public void onBeforeExit() {
+	public void onBeforeExit()
+	{
 
 	}
 
-	public Object getMyLocalData() {
+	public Object getMyLocalData()
+	{
 		return null;
 	}
 
-	public void run() {
+	public void run()
+	{
 		onStart();
-		while (true) {
+		while (true)
+		{
 			List<WebURL> assignedURLs = new ArrayList<WebURL>(50);
 			Frontier.getNextURLs(50, assignedURLs);
-			if (assignedURLs.size() == 0) {
-				if (Frontier.isFinished()) {
+			if (assignedURLs.size() == 0)
+			{
+				if (Frontier.isFinished())
+				{
 					return;
 				}
-				try {
+				try
+				{
 					Thread.sleep(3000);
-				} catch (InterruptedException e) {
+				}
+				catch (InterruptedException e)
+				{
 					e.printStackTrace();
 				}
-			} else {
-				for (WebURL curURL : assignedURLs) {
-					if (curURL != null) {
-						if (curURL.getDocid() == 14) {
+			}
+			else
+			{
+				for (WebURL curURL : assignedURLs)
+				{
+					if (curURL != null)
+					{
+						if (curURL.getDocid() == 14)
+						{
 							System.out.println();
 						}
 						processPage(curURL);
@@ -113,16 +136,20 @@ public class WebCrawler implements Runnable {
 		}
 	}
 
-	public boolean shouldVisit(WebURL url) {
+	public boolean shouldVisit(WebURL url)
+	{
 		return true;
 	}
 
-	public void visit(Page page) {
+	public void visit(Page page)
+	{
 		// Should be implemented in sub classes
 	}
 
-	private int processPage(WebURL curURL) {
-		if (curURL == null) {
+	private int processPage(WebURL curURL)
+	{
+		if (curURL == null)
+		{
 			return -1;
 		}
 		Page page = new Page(curURL);
@@ -130,68 +157,95 @@ public class WebCrawler implements Runnable {
 		// The page might have been redirected. So we have to refresh curURL
 		curURL = page.getWebURL();
 		int docid = curURL.getDocid();
-		if (statusCode != PageFetchStatus.OK) {
-			if (statusCode == PageFetchStatus.Moved) {
-				if (FOLLOW_REDIRECTS) {
+		if (statusCode != PageFetchStatus.OK)
+		{
+			if (statusCode == PageFetchStatus.Moved)
+			{
+				if (FOLLOW_REDIRECTS)
+				{
 					String movedToUrl = curURL.getURL();
-					if (movedToUrl == null) {
+					if (movedToUrl == null)
+					{
 						return PageFetchStatus.MovedToUnknownLocation;
 					}
 					movedToUrl = URLCanonicalizer.getCanonicalURL(movedToUrl);
+					if (movedToUrl == null)
+					{
+						// Null url so just ignore
+						return PageFetchStatus.PageTooBig;
+					}
+					
 					int newdocid = DocIDServer.getDocID(movedToUrl);
-					if (newdocid > 0) {
+					if (newdocid > 0)
+					{
 						return PageFetchStatus.RedirectedPageIsSeen;
-					} else {
+					}
+					else
+					{
 						WebURL webURL = new WebURL();
 						webURL.setURL(movedToUrl);
 						webURL.setParentDocid(curURL.getParentDocid());
 						webURL.setDepth((short) (curURL.getDepth()));
 						webURL.setDocid(-1);
-						if (shouldVisit(webURL) && RobotstxtServer.allows(webURL)) {
-							webURL.setDocid(DocIDServer.getNewDocID(movedToUrl));	
+						if (shouldVisit(webURL) && RobotstxtServer.allows(webURL))
+						{
+							webURL.setDocid(DocIDServer.getNewDocID(movedToUrl));
 							Frontier.schedule(webURL);
 						}
 					}
 				}
 				return PageFetchStatus.Moved;
-			} else if (statusCode == PageFetchStatus.PageTooBig) {
+			}
+			else if (statusCode == PageFetchStatus.PageTooBig)
+			{
 				logger.error("Page was bigger than max allowed size: " + curURL.getURL());
 			}
 			return statusCode;
 		}
 
-		try {
-			if (!page.isBinary()) {
+		try
+		{
+			if (!page.isBinary())
+			{
 				htmlParser.parse(page.getHTML(), curURL.getURL());
 				page.setText(htmlParser.getText());
 				page.setTitle(htmlParser.getTitle());
 
-				if (page.getText() == null) {
+				if (page.getText() == null)
+				{
 					return PageFetchStatus.NotInTextFormat;
 				}
 
 				Iterator<String> it = htmlParser.getLinks().iterator();
 				List<WebURL> toSchedule = new ArrayList<WebURL>();
 				List<WebURL> toList = new ArrayList<WebURL>();
-				while (it.hasNext()) {
+				while (it.hasNext())
+				{
 					String url = it.next();
-					if (url != null) {
+					if (url != null)
+					{
 						int newdocid = DocIDServer.getDocID(url);
-						if (newdocid > 0) {
-							if (newdocid != docid) {
+						if (newdocid > 0)
+						{
+							if (newdocid != docid)
+							{
 								WebURL webURL = new WebURL();
 								webURL.setURL(url);
 								webURL.setDocid(newdocid);
 								toList.add(webURL);
 							}
-						} else {
+						}
+						else
+						{
 							WebURL webURL = new WebURL();
 							webURL.setURL(url);
 							webURL.setDocid(-1);
 							webURL.setParentDocid(docid);
-							webURL.setDepth((short) (curURL.getDepth() + 1));							
-							if (shouldVisit(webURL) && RobotstxtServer.allows(webURL)) {
-								if (MAX_CRAWL_DEPTH == -1 || curURL.getDepth() < MAX_CRAWL_DEPTH) {
+							webURL.setDepth((short) (curURL.getDepth() + 1));
+							if (shouldVisit(webURL) && RobotstxtServer.allows(webURL))
+							{
+								if (MAX_CRAWL_DEPTH == -1 || curURL.getDepth() < MAX_CRAWL_DEPTH)
+								{
 									webURL.setDocid(DocIDServer.getNewDocID(url));
 									toSchedule.add(webURL);
 									toList.add(webURL);
@@ -204,22 +258,27 @@ public class WebCrawler implements Runnable {
 				page.setURLs(toList);
 			}
 			visit(page);
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 			logger.error(e.getMessage() + ", while processing: " + curURL.getURL());
 		}
 		return PROCESS_OK;
 	}
 
-	public Thread getThread() {
+	public Thread getThread()
+	{
 		return myThread;
 	}
 
-	public void setThread(Thread myThread) {
+	public void setThread(Thread myThread)
+	{
 		this.myThread = myThread;
 	}
 
-	public static void setMaximumCrawlDepth(short depth) {
+	public static void setMaximumCrawlDepth(short depth)
+	{
 		MAX_CRAWL_DEPTH = depth;
 	}
 }

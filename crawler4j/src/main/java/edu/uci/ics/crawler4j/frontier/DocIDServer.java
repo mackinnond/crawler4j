@@ -67,6 +67,7 @@ public final class DocIDServer {
 			OperationStatus result = null;
 			DatabaseEntry value = new DatabaseEntry();
 			try {
+				
 				DatabaseEntry key = new DatabaseEntry(url.getBytes());
 				result = docIDsDB.get(null, key, value, null);
 
