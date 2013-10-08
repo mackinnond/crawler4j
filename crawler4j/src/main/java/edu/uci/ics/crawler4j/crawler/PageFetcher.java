@@ -48,41 +48,79 @@ import edu.uci.ics.crawler4j.frontier.DocIDServer;
 import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class PageFetcher.
+ *
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public final class PageFetcher {
+public final class PageFetcher
+{
 
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(PageFetcher.class);
 
+	/** The connection manager. */
 	private static ThreadSafeClientConnManager connectionManager;
 
+	/** The httpclient. */
 	private static DefaultHttpClient httpclient;
 
+	/** The mutex. */
 	private static Object mutex = PageFetcher.class.toString() + "_MUTEX";
 
+	/** The processed count. */
 	private static int processedCount = 0;
+	
+	/** The start of period. */
 	private static long startOfPeriod = 0;
+	
+	/** The last fetch time. */
 	private static long lastFetchTime = 0;
 
+	/** The politeness delay. */
 	private static long politenessDelay = Configurations.getIntProperty("fetcher.default_politeness_delay", 200);
 
+	/** The Constant MAX_DOWNLOAD_SIZE. */
 	public static final int MAX_DOWNLOAD_SIZE = Configurations.getIntProperty("fetcher.max_download_size", 1048576);
 
+	/** The Constant show404Pages. */
 	private static final boolean show404Pages = Configurations.getBooleanProperty("logging.show_404_pages", true);
 
+	/** The connection monitor thread. */
 	private static IdleConnectionMonitorThread connectionMonitorThread = null;
 
-	public static long getPolitenessDelay() {
+	/**
+	 * Gets the politeness delay.
+	 *
+	 * @return the politeness delay
+	 */
+	public static long getPolitenessDelay()
+	{
 		return politenessDelay;
 	}
 
-	public static void setPolitenessDelay(long politenessDelay) {
+	/**
+	 * Sets the politeness delay.
+	 *
+	 * @param politenessDelay the new politeness delay
+	 */
+	public static void setPolitenessDelay(long politenessDelay)
+	{
 		PageFetcher.politenessDelay = politenessDelay;
 	}
 
-	static {
+	static
+	{
+		initConnnectionManager();
+	}
+
+	/**
+	 * Inits the connnection manager.
+	 */
+	private static void initConnnectionManager()
+	{
 		HttpParams params = new BasicHttpParams();
 		HttpProtocolParamBean paramsBean = new HttpProtocolParamBean(params);
 		paramsBean.setVersion(HttpVersion.HTTP_1_1);
@@ -108,7 +146,8 @@ public final class PageFetcher {
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
 		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 
-		if (Configurations.getBooleanProperty("fetcher.crawl_https", false)) {
+		if (Configurations.getBooleanProperty("fetcher.crawl_https", false))
+		{
 			schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
 		}
 
@@ -117,29 +156,56 @@ public final class PageFetcher {
 		httpclient = new DefaultHttpClient(connectionManager, params);
 	}
 
-	public synchronized static void startConnectionMonitorThread() {
-		if (connectionMonitorThread == null) {
-			connectionMonitorThread = new IdleConnectionMonitorThread(connectionManager);
-		}
+	/**
+	 * Start connection monitor thread.
+	 */
+	public synchronized static void startConnectionMonitorThread()
+	{
+		// Stop and restart thread if already running!
+		/*if (connectionMonitorThread != null)
+		{
+			connectionManager.shutdown();
+			connectionMonitorThread.shutdown();
+		}*/
+		connectionMonitorThread = new IdleConnectionMonitorThread(connectionManager);
+
 		connectionMonitorThread.start();
 	}
 
-	public synchronized static void stopConnectionMonitorThread() {
-		if (connectionMonitorThread != null) {
+	/**
+	 * Stop connection monitor thread.
+	 */
+	public synchronized static void stopConnectionMonitorThread()
+	{
+		if (connectionMonitorThread != null)
+		{
 			connectionManager.shutdown();
 			connectionMonitorThread.shutdown();
+			
+			initConnnectionManager();
 		}
 	}
 
-	public static int fetch(Page page, boolean ignoreIfBinary) {
+	/**
+	 * Fetch.
+	 *
+	 * @param page the page
+	 * @param ignoreIfBinary the ignore if binary
+	 * @return the int
+	 */
+	public static int fetch(Page page, boolean ignoreIfBinary)
+	{
 		String toFetchURL = page.getWebURL().getURL();
 		HttpGet get = null;
 		HttpEntity entity = null;
-		try {
+		try
+		{
 			get = new HttpGet(toFetchURL);
-			synchronized (mutex) {
+			synchronized (mutex)
+			{
 				long now = (new Date()).getTime();
-				if (now - startOfPeriod > 10000) {
+				if (now - startOfPeriod > 10000)
+				{
 					logger.info("Number of pages fetched per second: " + processedCount
 							/ ((now - startOfPeriod) / 1000));
 					processedCount = 0;
@@ -147,29 +213,39 @@ public final class PageFetcher {
 				}
 				processedCount++;
 
-				if (now - lastFetchTime < politenessDelay) {
+				if (now - lastFetchTime < politenessDelay)
+				{
 					Thread.sleep(politenessDelay - (now - lastFetchTime));
 				}
 				lastFetchTime = (new Date()).getTime();
 			}
+
 			HttpResponse response = httpclient.execute(get);
 			entity = response.getEntity();
 
 			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode != HttpStatus.SC_OK) {
-				if (statusCode != HttpStatus.SC_NOT_FOUND) {
-					if (statusCode == HttpStatus.SC_MOVED_PERMANENTLY || statusCode == HttpStatus.SC_MOVED_TEMPORARILY) {
+			if (statusCode != HttpStatus.SC_OK)
+			{
+				if (statusCode != HttpStatus.SC_NOT_FOUND)
+				{
+					if (statusCode == HttpStatus.SC_MOVED_PERMANENTLY || statusCode == HttpStatus.SC_MOVED_TEMPORARILY)
+					{
 						Header header = response.getFirstHeader("Location");
-						if (header != null) {
+						if (header != null)
+						{
 							String movedToUrl = header.getValue();
 							page.getWebURL().setURL(movedToUrl);
-						} else {
+						}
+						else
+						{
 							page.getWebURL().setURL(null);
 						}
 						return PageFetchStatus.Moved;
 					}
 					logger.info("Failed: " + response.getStatusLine().toString() + ", while fetching " + toFetchURL);
-				} else if (show404Pages) {
+				}
+				else if (show404Pages)
+				{
 					logger.info("Not Found: " + toFetchURL + " (Link found in doc#: "
 							+ page.getWebURL().getParentDocid() + ")");
 				}
@@ -177,11 +253,15 @@ public final class PageFetcher {
 			}
 
 			String uri = get.getURI().toString();
-			if (!uri.equals(toFetchURL)) {
-				if (!URLCanonicalizer.getCanonicalURL(uri).equals(toFetchURL)) {
+			if (!uri.equals(toFetchURL))
+			{
+				if (!URLCanonicalizer.getCanonicalURL(uri).equals(toFetchURL))
+				{
 					int newdocid = DocIDServer.getDocID(uri);
-					if (newdocid != -1) {
-						if (newdocid > 0) {
+					if (newdocid != -1)
+					{
+						if (newdocid > 0)
+						{
 							return PageFetchStatus.RedirectedPageIsSeen;
 						}
 						WebURL webURL = new WebURL();
@@ -192,20 +272,27 @@ public final class PageFetcher {
 				}
 			}
 
-			if (entity != null) {
+			if (entity != null)
+			{
 				long size = entity.getContentLength();
-				if (size == -1) {
+				if (size == -1)
+				{
 					Header length = response.getLastHeader("Content-Length");
-					if (length == null) {
+					if (length == null)
+					{
 						length = response.getLastHeader("Content-length");
 					}
-					if (length != null) {
+					if (length != null)
+					{
 						size = Integer.parseInt(length.getValue());
-					} else {
+					}
+					else
+					{
 						size = -1;
 					}
 				}
-				if (size > MAX_DOWNLOAD_SIZE) {
+				if (size > MAX_DOWNLOAD_SIZE)
+				{
 					entity.consumeContent();
 					return PageFetchStatus.PageTooBig;
 				}
@@ -213,57 +300,98 @@ public final class PageFetcher {
 				boolean isBinary = false;
 
 				Header type = entity.getContentType();
-				if (type != null) {
+				if (type != null)
+				{
 					String typeStr = type.getValue().toLowerCase();
-					if (typeStr.contains("image") || typeStr.contains("audio") || typeStr.contains("video")) {
+					if (typeStr.contains("image") || typeStr.contains("audio") || typeStr.contains("video"))
+					{
 						isBinary = true;
-						if (ignoreIfBinary) {
+						if (ignoreIfBinary)
+						{
 							return PageFetchStatus.PageIsBinary;
 						}
 					}
 				}
 
-				if (page.load(entity.getContent(), (int) size, isBinary)) {
+				if (page.load(entity.getContent(), (int) size, isBinary))
+				{
 					return PageFetchStatus.OK;
-				} else {
+				}
+				else
+				{
 					return PageFetchStatus.PageLoadError;
 				}
-			} else {
+			}
+			else
+			{
 				get.abort();
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			logger.error("Fatal transport error: " + e.getMessage() + " while fetching " + toFetchURL
 					+ " (link found in doc #" + page.getWebURL().getParentDocid() + ")");
 			return PageFetchStatus.FatalTransportError;
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e)
+		{
 			// ignoring exceptions that occur because of not registering https
 			// and other schemes
-		} catch (Exception e) {
-			if (e.getMessage() == null) {
+		}
+		catch (Exception e)
+		{
+			if (e.getMessage() == null)
+			{
 				logger.error("Error while fetching " + page.getWebURL().getURL());
-			} else {
+			}
+			else
+			{
 				logger.error(e.getMessage() + " while fetching " + page.getWebURL().getURL());
 			}
-		} finally {
-			try {
-				if (entity != null) {
+		}
+		finally
+		{
+			try
+			{
+				if (entity != null)
+				{
 					entity.consumeContent();
-				} else if (get != null) {
+				}
+				else if (get != null)
+				{
 					get.abort();
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 		return PageFetchStatus.UnknownError;
 	}
 
-	public static void setProxy(String proxyHost, int proxyPort) {
+	/**
+	 * Sets the proxy.
+	 *
+	 * @param proxyHost the proxy host
+	 * @param proxyPort the proxy port
+	 */
+	public static void setProxy(String proxyHost, int proxyPort)
+	{
 		HttpHost proxy = new HttpHost(proxyHost, proxyPort);
 		httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 	}
 
-	public static void setProxy(String proxyHost, int proxyPort, String username, String password) {
+	/**
+	 * Sets the proxy.
+	 *
+	 * @param proxyHost the proxy host
+	 * @param proxyPort the proxy port
+	 * @param username the username
+	 * @param password the password
+	 */
+	public static void setProxy(String proxyHost, int proxyPort, String username, String password)
+	{
 		httpclient.getCredentialsProvider().setCredentials(new AuthScope(proxyHost, proxyPort),
 				new UsernamePasswordCredentials(username, password));
 		setProxy(proxyHost, proxyPort);

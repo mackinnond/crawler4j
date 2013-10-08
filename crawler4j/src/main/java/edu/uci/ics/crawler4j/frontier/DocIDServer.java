@@ -64,12 +64,6 @@ public final class DocIDServer {
 			if (docIDsDB == null) {
 				return -1;
 			}
-
-			if (url == null)
-			{
-				return -1;
-			}
-			
 			OperationStatus result = null;
 			DatabaseEntry value = new DatabaseEntry();
 			try {

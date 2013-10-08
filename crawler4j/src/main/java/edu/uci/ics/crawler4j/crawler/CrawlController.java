@@ -18,6 +18,7 @@
 package edu.uci.ics.crawler4j.crawler;
 
 import java.io.File;
+
 import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,6 @@ import org.apache.log4j.Logger;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 
-import edu.uci.ics.crawler4j.example.advanced.CrawlStat;
 import edu.uci.ics.crawler4j.frontier.DocIDServer;
 import edu.uci.ics.crawler4j.frontier.Frontier;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
@@ -35,30 +35,61 @@ import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 import edu.uci.ics.crawler4j.url.WebURL;
 import edu.uci.ics.crawler4j.util.IO;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class CrawlController.
+ *
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public class CrawlController {
+public final class CrawlController
+{
 
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(CrawlController.class.getName());
 
+	/** The env. */
 	private Environment env;
+	
+	/** The crawlers local data. */
 	private List<Object> crawlersLocalData = new ArrayList<Object>();
 
-	public List<Object> getCrawlersLocalData() {
+	/**
+	 * Gets the crawlers local data.
+	 *
+	 * @return the crawlers local data
+	 */
+	public List<Object> getCrawlersLocalData()
+	{
 		return crawlersLocalData;
 	}
 
+	/** The threads. */
 	List<Thread> threads;
 
-	public CrawlController(String storageFolder) throws Exception {
+	/**
+	 * Instantiates a new crawl controller.
+	 *
+	 * @param storageFolder the storage folder
+	 * @throws Exception the exception
+	 */
+	public CrawlController(String storageFolder) throws Exception
+	{
 		this(storageFolder, Configurations.getBooleanProperty("crawler.enable_resume", true));
 	}
-	
-	public CrawlController(String storageFolder, boolean resumable) throws Exception {
+
+	/**
+	 * Instantiates a new crawl controller.
+	 *
+	 * @param storageFolder the storage folder
+	 * @param resumable the resumable
+	 * @throws Exception the exception
+	 */
+	public CrawlController(String storageFolder, boolean resumable) throws Exception
+	{
 		File folder = new File(storageFolder);
-		if (!folder.exists()) {
+		if (!folder.exists())
+		{
 			folder.mkdirs();
 		}
 
@@ -68,10 +99,12 @@ public class CrawlController {
 		envConfig.setLocking(resumable);
 
 		File envHome = new File(storageFolder + "/frontier");
-		if (!envHome.exists()) {
+		if (!envHome.exists())
+		{
 			envHome.mkdir();
 		}
-		if (!resumable) {
+		if (!resumable)
+		{
 			IO.deleteFolderContents(envHome);
 		}
 
@@ -82,13 +115,23 @@ public class CrawlController {
 		PageFetcher.startConnectionMonitorThread();
 	}
 
-	public <T extends WebCrawler> void start(Class<T> _c, int numberOfCrawlers) {
-		try {
+	/**
+	 * Start.
+	 *
+	 * @param <T> the generic type
+	 * @param _c the _c
+	 * @param numberOfCrawlers the number of crawlers
+	 */
+	public <T extends WebCrawler> void start(Class<T> _c, int numberOfCrawlers)
+	{
+		try
+		{
 			crawlersLocalData.clear();
 			threads = new ArrayList<Thread>();
 			List<T> crawlers = new ArrayList<T>();
 			int numberofCrawlers = numberOfCrawlers;
-			for (int i = 1; i <= numberofCrawlers; i++) {
+			for (int i = 1; i <= numberofCrawlers; i++)
+			{
 				T crawler = _c.newInstance();
 				Thread thread = new Thread(crawler, "Crawler " + i);
 				crawler.setThread(thread);
@@ -99,12 +142,15 @@ public class CrawlController {
 				threads.add(thread);
 				logger.info("Crawler " + i + " started.");
 			}
-			while (true) {
+			while (true)
+			{
 				sleep(10);
 				boolean someoneIsWorking = false;
-				for (int i = 0; i < threads.size(); i++) {
+				for (int i = 0; i < threads.size(); i++)
+				{
 					Thread thread = threads.get(i);
-					if (!thread.isAlive()) {
+					if (!thread.isAlive())
+					{
 						logger.info("Thread " + i + " was dead, I'll recreate it.");
 						T crawler = _c.newInstance();
 						thread = new Thread(crawler, "Crawler " + (i + 1));
@@ -116,75 +162,110 @@ public class CrawlController {
 						thread.start();
 						crawlers.remove(i);
 						crawlers.add(i, crawler);
-					} else if (thread.getState() == State.RUNNABLE) {
+					}
+					else if (thread.getState() == State.RUNNABLE)
+					{
 						someoneIsWorking = true;
 					}
 				}
-				if (!someoneIsWorking) {
+				if (!someoneIsWorking)
+				{
 					// Make sure again that none of the threads are alive.
 					logger.info("It looks like no thread is working, waiting for 40 seconds to make sure...");
 					sleep(40);
 
-					if (!isAnyThreadWorking()) {
+					if (!isAnyThreadWorking())
+					{
 						long queueLength = Frontier.getQueueLength();
-						if (queueLength > 0) {
+						if (queueLength > 0)
+						{
 							continue;
 						}
 						logger.info("No thread is working and no more URLs are in queue waiting for another 60 seconds to make sure...");
 						sleep(60);
 						queueLength = Frontier.getQueueLength();
-						if (queueLength > 0) {
+						if (queueLength > 0)
+						{
 							continue;
 						}
 						logger.info("All of the crawlers are stopped. Finishing the process...");
-						for (T crawler : crawlers) {
+						for (T crawler : crawlers)
+						{
 							crawler.onBeforeExit();
 							crawlersLocalData.add(crawler.getMyLocalData());
 						}
 
-						// At this step, frontier notifies the threads that were waiting for new URLs and they should stop
+						// At this step, frontier notifies the threads that were waiting for new URLs and they should
+						// stop
 						// We will wait a few seconds for them and then return.
 						Frontier.finish();
 						logger.info("Waiting for 10 seconds before final clean up...");
 						sleep(10);
 
 						Frontier.close();
-						PageFetcher.stopConnectionMonitorThread();
+						//PageFetcher.stopConnectionMonitorThread();
 						return;
 					}
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 	}
 
-	private void sleep(int seconds) {
-		try {
+	/**
+	 * Sleep.
+	 *
+	 * @param seconds the seconds
+	 */
+	private void sleep(int seconds)
+	{
+		try
+		{
 			Thread.sleep(seconds * 1000);
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 		}
 	}
 
-	private boolean isAnyThreadWorking() {
+	/**
+	 * Checks if is any thread working.
+	 *
+	 * @return true, if is any thread working
+	 */
+	private boolean isAnyThreadWorking()
+	{
 		boolean someoneIsWorking = false;
-		for (int i = 0; i < threads.size(); i++) {
+		for (int i = 0; i < threads.size(); i++)
+		{
 			Thread thread = threads.get(i);
-			if (thread.isAlive() && thread.getState() == State.RUNNABLE) {
+			if (thread.isAlive() && thread.getState() == State.RUNNABLE)
+			{
 				someoneIsWorking = true;
 			}
 		}
 		return someoneIsWorking;
 	}
 
-	public void addSeed(String pageUrl) {
+	/**
+	 * Adds the seed.
+	 *
+	 * @param pageUrl the page url
+	 */
+	public void addSeed(String pageUrl)
+	{
 		String canonicalUrl = URLCanonicalizer.getCanonicalURL(pageUrl);
-		if (canonicalUrl == null) {
+		if (canonicalUrl == null)
+		{
 			logger.error("Invalid seed URL: " + pageUrl);
 			return;
 		}
 		int docid = DocIDServer.getDocID(canonicalUrl);
-		if (docid > 0) {
+		if (docid > 0)
+		{
 			// This URL is already seen.
 			return;
 		}
@@ -194,42 +275,92 @@ public class CrawlController {
 		docid = DocIDServer.getNewDocID(canonicalUrl);
 		webUrl.setDocid(docid);
 		webUrl.setDepth((short) 0);
-		if (!RobotstxtServer.allows(webUrl)) {
+		if (!RobotstxtServer.allows(webUrl))
+		{
 			logger.info("Robots.txt does not allow this seed: " + pageUrl);
-		} else {
+		}
+		else
+		{
 			Frontier.schedule(webUrl);
 		}
 	}
 
-	public void setPolitenessDelay(int milliseconds) {
-		if (milliseconds < 0) {
+	/**
+	 * Sets the politeness delay.
+	 *
+	 * @param milliseconds the new politeness delay
+	 */
+	public void setPolitenessDelay(int milliseconds)
+	{
+		if (milliseconds < 0)
+		{
 			return;
 		}
-		if (milliseconds > 10000) {
+		if (milliseconds > 10000)
+		{
 			milliseconds = 10000;
 		}
 		PageFetcher.setPolitenessDelay(milliseconds);
 	}
 
-	public void setMaximumCrawlDepth(int depth) throws Exception {
-		if (depth < -1) {
+	/**
+	 * Sets the maximum crawl depth.
+	 *
+	 * @param depth the new maximum crawl depth
+	 * @throws Exception the exception
+	 */
+	public void setMaximumCrawlDepth(int depth) throws Exception
+	{
+		if (depth < -1)
+		{
 			throw new Exception("Maximum crawl depth should be either a positive number or -1 for unlimited depth.");
 		}
-		if (depth > Short.MAX_VALUE) {
+		if (depth > Short.MAX_VALUE)
+		{
 			throw new Exception("Maximum value for crawl depth is " + Short.MAX_VALUE);
 		}
 		WebCrawler.setMaximumCrawlDepth((short) depth);
 	}
 
-	public void setMaximumPagesToFetch(int max) {
+	/**
+	 * Sets the maximum pages to fetch.
+	 *
+	 * @param max the new maximum pages to fetch
+	 */
+	public void setMaximumPagesToFetch(int max)
+	{
 		Frontier.setMaximumPagesToFetch(max);
 	}
 
-	public void setProxy(String proxyHost, int proxyPort) {
+	/**
+	 * Sets the proxy.
+	 *
+	 * @param proxyHost the proxy host
+	 * @param proxyPort the proxy port
+	 */
+	public void setProxy(String proxyHost, int proxyPort)
+	{
 		PageFetcher.setProxy(proxyHost, proxyPort);
 	}
 
-	public static void setProxy(String proxyHost, int proxyPort, String username, String password) {
+	/**
+	 * Sets the proxy.
+	 *
+	 * @param proxyHost the proxy host
+	 * @param proxyPort the proxy port
+	 * @param username the username
+	 * @param password the password
+	 */
+	public static void setProxy(String proxyHost, int proxyPort, String username, String password)
+	{
 		PageFetcher.setProxy(proxyHost, proxyPort, username, password);
+	}
+
+	/**
+	 * Close db.
+	 */
+	public void closeDB()
+	{
+		env.close();
 	}
 }

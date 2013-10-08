@@ -31,12 +31,14 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class MyCrawler extends WebCrawler
 {
+	
+	/** The base url. */
 	private String baseUrl;
 
 	/** The Constant FILTERS. */
 	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|doc|js|bmp|gif|jpe?g"
 			+ "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-
+	
 	/** The my crawl stat. */
 	CrawlStat myCrawlStat;
 
@@ -48,18 +50,11 @@ public class MyCrawler extends WebCrawler
 		myCrawlStat = new CrawlStat();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#shouldVisit(edu.uci.ics.crawler4j.url.WebURL)
 	 */
 	public boolean shouldVisit(WebURL url)
 	{
-		/*
-		 * String href = url.getURL().toLowerCase(); if (filters.matcher(href).matches()) { return false; } if
-		 * (href.startsWith("http://www.ics.uci.edu/")) { return true; } return false;
-		 */
-
 		if (url == null)
 		{
 			return false;
@@ -79,7 +74,7 @@ public class MyCrawler extends WebCrawler
 			lastPos = href.indexOf("/", lastPos);
 			if (lastPos == -1)
 			{
-				baseUrl = href; 
+				baseUrl = href;
 			}
 			else
 			{
@@ -112,9 +107,7 @@ public class MyCrawler extends WebCrawler
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#visit(edu.uci.ics.crawler4j.crawler.Page)
 	 */
 	public void visit(Page page)
@@ -136,6 +129,7 @@ public class MyCrawler extends WebCrawler
 		myCrawlStat.getTextBuff().append(text + "\n ");
 		myCrawlStat.getTextBuff().append("========\n ");
 
+		myCrawlStat.incProcessedPages();
 		List<WebURL> links = page.getURLs();
 		myCrawlStat.incTotalLinks(links.size());
 		try
@@ -153,9 +147,7 @@ public class MyCrawler extends WebCrawler
 	}
 
 	// This function is called by controller to get the local data of this crawler when job is finished
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#getMyLocalData()
 	 */
 	public Object getMyLocalData()
@@ -165,9 +157,7 @@ public class MyCrawler extends WebCrawler
 
 	// This function is called by controller before finishing the job.
 	// You can put whatever stuff you need here.
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#onBeforeExit()
 	 */
 	public void onBeforeExit()

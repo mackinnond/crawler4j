@@ -83,5 +83,4 @@ public class CrawlStat
 	{
 		this.textBuff = textBuff;
 	}
-
 }
