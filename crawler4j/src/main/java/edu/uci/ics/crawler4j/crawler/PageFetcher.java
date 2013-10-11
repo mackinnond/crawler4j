@@ -111,16 +111,14 @@ public final class PageFetcher
 		PageFetcher.politenessDelay = politenessDelay;
 	}
 
-	static
-	{
-		initConnnectionManager();
-	}
 
 	/**
 	 * Inits the connnection manager.
 	 */
 	private static void initConnnectionManager()
 	{
+		System.out.println("initConnnectionManager()");
+
 		HttpParams params = new BasicHttpParams();
 		HttpProtocolParamBean paramsBean = new HttpProtocolParamBean(params);
 		paramsBean.setVersion(HttpVersion.HTTP_1_1);
@@ -161,12 +159,16 @@ public final class PageFetcher
 	 */
 	public synchronized static void startConnectionMonitorThread()
 	{
+		System.out.println("startConnectionMonitorThread()");
+
 		// Stop and restart thread if already running!
 		/*if (connectionMonitorThread != null)
 		{
 			connectionManager.shutdown();
 			connectionMonitorThread.shutdown();
 		}*/
+		initConnnectionManager();
+		
 		connectionMonitorThread = new IdleConnectionMonitorThread(connectionManager);
 
 		connectionMonitorThread.start();
@@ -177,6 +179,8 @@ public final class PageFetcher
 	 */
 	public synchronized static void stopConnectionMonitorThread()
 	{
+		System.out.println("stopConnectionMonitorThread()");
+		
 		if (connectionMonitorThread != null)
 		{
 			connectionManager.shutdown();
