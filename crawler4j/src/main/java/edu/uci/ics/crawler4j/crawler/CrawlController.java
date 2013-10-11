@@ -361,6 +361,8 @@ public final class CrawlController
 	 */
 	public void closeDB()
 	{
+		System.out.println("closeDB()");
+
 		env.close();
 	}
 }

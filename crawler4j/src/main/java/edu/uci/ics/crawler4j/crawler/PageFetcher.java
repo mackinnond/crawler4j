@@ -183,6 +183,8 @@ public final class PageFetcher
 		
 		if (connectionMonitorThread != null)
 		{
+			System.out.println("\t connectionManager.shutdown");
+
 			connectionManager.shutdown();
 			connectionMonitorThread.shutdown();
 			
