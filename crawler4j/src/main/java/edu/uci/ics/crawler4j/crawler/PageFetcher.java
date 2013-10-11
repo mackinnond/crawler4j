@@ -186,7 +186,7 @@ public final class PageFetcher
 			connectionManager.shutdown();
 			connectionMonitorThread.shutdown();
 			
-			initConnnectionManager();
+			//initConnnectionManager();
 		}
 	}
 
