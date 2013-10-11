@@ -27,7 +27,8 @@ import edu.uci.ics.crawler4j.util.Util;
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public final class DocIDServer {
+public final class DocIDServer
+{
 
 	private static Database docIDsDB = null;
 
@@ -37,97 +38,132 @@ public final class DocIDServer {
 	private static int lastDocID;
 	private static boolean resumable;
 
-	public static void init(Environment env, boolean resumable) throws DatabaseException {
+	public static void init(Environment env, boolean resumable) throws DatabaseException
+	{
 		DocIDServer.resumable = resumable;
 		DatabaseConfig dbConfig = new DatabaseConfig();
 		dbConfig.setAllowCreate(true);
 		dbConfig.setTransactional(resumable);
 		dbConfig.setDeferredWrite(!resumable);
 		docIDsDB = env.openDatabase(null, "DocIDs", dbConfig);
-		if (resumable) {
+		if (resumable)
+		{
 			int docCount = getDocCount();
-			if (docCount > 0) {
+			if (docCount > 0)
+			{
 				logger.info("Loaded " + docCount + " URLs that had been detected in previous crawl.");
 				lastDocID = docCount;
 			}
-		} else {
+		}
+		else
+		{
 			lastDocID = 0;
 		}
 	}
 
 	/**
-	 * Returns the docid of an already seen url.
-	 * If url is not seen before, it will return -1
+	 * Returns the docid of an already seen url. If url is not seen before, it will return -1
 	 */
-	public static int getDocID(String url) {
-		synchronized (mutex) {
-			if (docIDsDB == null) {
+	public static int getDocID(String url)
+	{
+		synchronized (mutex)
+		{
+			if (docIDsDB == null)
+			{
 				return -1;
 			}
 			OperationStatus result = null;
 			DatabaseEntry value = new DatabaseEntry();
-			try {
-				
+			try
+			{
+
 				DatabaseEntry key = new DatabaseEntry(url.getBytes());
 				result = docIDsDB.get(null, key, value, null);
 
-				if (result == OperationStatus.SUCCESS && value.getData().length > 0) {
+				if (result == OperationStatus.SUCCESS && value.getData().length > 0)
+				{
 					return Util.byteArray2Int(value.getData());
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 			return -1;
 		}
 	}
 
-	public static int getNewDocID(String url) {
-		synchronized (mutex) {
-			try {
+	public static int getNewDocID(String url)
+	{
+		synchronized (mutex)
+		{
+			try
+			{
 				// Make sure that we have not already assigned a docid for this URL
 				int docid = getDocID(url);
-				if (docid > 0) {
+				if (docid > 0)
+				{
 					return docid;
 				}
 
 				lastDocID++;
 				docIDsDB.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(Util.int2ByteArray(lastDocID)));
 				return lastDocID;
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 			return -1;
 		}
 	}
 
-	public static int getDocCount() {
-		try {
+	public static int getDocCount()
+	{
+		try
+		{
 			return (int) docIDsDB.count();
-		} catch (DatabaseException e) {
+		}
+		catch (DatabaseException e)
+		{
 			e.printStackTrace();
 		}
 		return -1;
 	}
 
-	public static void sync() {
-		if (resumable) {
+	public static void sync()
+	{
+		if (resumable)
+		{
 			return;
 		}
-		if (docIDsDB == null) {
+		if (docIDsDB == null)
+		{
 			return;
 		}
-		try {
+		try
+		{
 			docIDsDB.sync();
-		} catch (DatabaseException e) {
+		}
+		catch (DatabaseException e)
+		{
 			e.printStackTrace();
 		}
 	}
 
-	public static void close() {
-		try {
-			docIDsDB.close();
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+	public static void close()
+	{
+		if (docIDsDB != null)
+		{
+
+			try
+			{
+				docIDsDB.close();
+			}
+			catch (DatabaseException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }
