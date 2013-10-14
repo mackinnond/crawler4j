@@ -38,7 +38,7 @@ import edu.uci.ics.crawler4j.util.IO;
 // TODO: Auto-generated Javadoc
 /**
  * The Class CrawlController.
- *
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
@@ -50,13 +50,13 @@ public final class CrawlController
 
 	/** The env. */
 	private Environment env;
-	
+
 	/** The crawlers local data. */
 	private List<Object> crawlersLocalData = new ArrayList<Object>();
 
 	/**
 	 * Gets the crawlers local data.
-	 *
+	 * 
 	 * @return the crawlers local data
 	 */
 	public List<Object> getCrawlersLocalData()
@@ -69,9 +69,11 @@ public final class CrawlController
 
 	/**
 	 * Instantiates a new crawl controller.
-	 *
-	 * @param storageFolder the storage folder
-	 * @throws Exception the exception
+	 * 
+	 * @param storageFolder
+	 *            the storage folder
+	 * @throws Exception
+	 *             the exception
 	 */
 	public CrawlController(String storageFolder) throws Exception
 	{
@@ -80,10 +82,13 @@ public final class CrawlController
 
 	/**
 	 * Instantiates a new crawl controller.
-	 *
-	 * @param storageFolder the storage folder
-	 * @param resumable the resumable
-	 * @throws Exception the exception
+	 * 
+	 * @param storageFolder
+	 *            the storage folder
+	 * @param resumable
+	 *            the resumable
+	 * @throws Exception
+	 *             the exception
 	 */
 	public CrawlController(String storageFolder, boolean resumable) throws Exception
 	{
@@ -103,11 +108,10 @@ public final class CrawlController
 		{
 			envHome.mkdir();
 		}
-		
-		/*if (!resumable)
-		{
-			IO.deleteFolderContents(envHome);
-		}*/
+
+		/*
+		 * if (!resumable) { IO.deleteFolderContents(envHome); }
+		 */
 
 		env = new Environment(envHome, envConfig);
 		Frontier.init(env, resumable);
@@ -118,10 +122,13 @@ public final class CrawlController
 
 	/**
 	 * Start.
-	 *
-	 * @param <T> the generic type
-	 * @param _c the _c
-	 * @param numberOfCrawlers the number of crawlers
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param _c
+	 *            the _c
+	 * @param numberOfCrawlers
+	 *            the number of crawlers
 	 */
 	public <T extends WebCrawler> void start(Class<T> _c, int numberOfCrawlers)
 	{
@@ -135,10 +142,13 @@ public final class CrawlController
 			{
 				T crawler = _c.newInstance();
 				Thread thread = new Thread(crawler, "Crawler " + i);
+				logger.info("Thread state1 = " + thread.getState().toString());
+
 				crawler.setThread(thread);
 				crawler.setMyId(i);
 				crawler.setMyController(this);
 				thread.start();
+				logger.info("Thread state2 = " + thread.getState().toString());
 				crawlers.add(crawler);
 				threads.add(thread);
 				logger.info("Crawler " + i + " started.");
@@ -155,18 +165,21 @@ public final class CrawlController
 						logger.info("Thread " + i + " was dead, I'll recreate it.");
 						T crawler = _c.newInstance();
 						thread = new Thread(crawler, "Crawler " + (i + 1));
+						logger.info("Thread state3 = " + thread.getState().toString());
 						threads.remove(i);
 						threads.add(i, thread);
 						crawler.setThread(thread);
 						crawler.setMyId(i + 1);
 						crawler.setMyController(this);
 						thread.start();
+						logger.info("Thread state4 = " + thread.getState().toString());
 						crawlers.remove(i);
 						crawlers.add(i, crawler);
 					}
 					else if (thread.getState() == State.RUNNABLE)
 					{
 						someoneIsWorking = true;
+						logger.info("Thread " + i + " was RUNNABLE.");
 					}
 				}
 				if (!someoneIsWorking)
@@ -203,8 +216,24 @@ public final class CrawlController
 						logger.info("Waiting for 10 seconds before final clean up...");
 						sleep(10);
 
-						Frontier.close();
-						//PageFetcher.stopConnectionMonitorThread();
+						try
+						{
+							Frontier.close();
+							env.close();
+
+						}
+						catch (Exception e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						for (int i = 0; i < threads.size(); i++)
+						{
+							Thread thread = threads.get(i);
+							logger.info("Thread state5 = " + thread.getState().toString());
+						}
+						// PageFetcher.stopConnectionMonitorThread();
 						return;
 					}
 				}
@@ -218,8 +247,9 @@ public final class CrawlController
 
 	/**
 	 * Sleep.
-	 *
-	 * @param seconds the seconds
+	 * 
+	 * @param seconds
+	 *            the seconds
 	 */
 	private void sleep(int seconds)
 	{
@@ -234,7 +264,7 @@ public final class CrawlController
 
 	/**
 	 * Checks if is any thread working.
-	 *
+	 * 
 	 * @return true, if is any thread working
 	 */
 	private boolean isAnyThreadWorking()
@@ -253,8 +283,9 @@ public final class CrawlController
 
 	/**
 	 * Adds the seed.
-	 *
-	 * @param pageUrl the page url
+	 * 
+	 * @param pageUrl
+	 *            the page url
 	 */
 	public void addSeed(String pageUrl)
 	{
@@ -288,8 +319,9 @@ public final class CrawlController
 
 	/**
 	 * Sets the politeness delay.
-	 *
-	 * @param milliseconds the new politeness delay
+	 * 
+	 * @param milliseconds
+	 *            the new politeness delay
 	 */
 	public void setPolitenessDelay(int milliseconds)
 	{
@@ -306,9 +338,11 @@ public final class CrawlController
 
 	/**
 	 * Sets the maximum crawl depth.
-	 *
-	 * @param depth the new maximum crawl depth
-	 * @throws Exception the exception
+	 * 
+	 * @param depth
+	 *            the new maximum crawl depth
+	 * @throws Exception
+	 *             the exception
 	 */
 	public void setMaximumCrawlDepth(int depth) throws Exception
 	{
@@ -325,8 +359,9 @@ public final class CrawlController
 
 	/**
 	 * Sets the maximum pages to fetch.
-	 *
-	 * @param max the new maximum pages to fetch
+	 * 
+	 * @param max
+	 *            the new maximum pages to fetch
 	 */
 	public void setMaximumPagesToFetch(int max)
 	{
@@ -335,9 +370,11 @@ public final class CrawlController
 
 	/**
 	 * Sets the proxy.
-	 *
-	 * @param proxyHost the proxy host
-	 * @param proxyPort the proxy port
+	 * 
+	 * @param proxyHost
+	 *            the proxy host
+	 * @param proxyPort
+	 *            the proxy port
 	 */
 	public void setProxy(String proxyHost, int proxyPort)
 	{
@@ -346,11 +383,15 @@ public final class CrawlController
 
 	/**
 	 * Sets the proxy.
-	 *
-	 * @param proxyHost the proxy host
-	 * @param proxyPort the proxy port
-	 * @param username the username
-	 * @param password the password
+	 * 
+	 * @param proxyHost
+	 *            the proxy host
+	 * @param proxyPort
+	 *            the proxy port
+	 * @param username
+	 *            the username
+	 * @param password
+	 *            the password
 	 */
 	public static void setProxy(String proxyHost, int proxyPort, String username, String password)
 	{
