@@ -236,6 +236,7 @@ public class WorkQueues
 		{
 			urlsDB.close();
 			Environment env = urlsDB.getEnvironment();
+			
 			Transaction txn = env.beginTransaction(null, null);
 
 			long truncated = env.truncateDatabase(txn, dbName, true);

@@ -222,6 +222,7 @@ public final class Frontier
 		sync();
 		workQueues.close();
 		DocIDServer.close();
+		inprocessPages.close();
 	}
 
 	public static void finish()
