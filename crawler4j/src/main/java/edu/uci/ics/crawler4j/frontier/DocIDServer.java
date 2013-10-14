@@ -37,6 +37,7 @@ public final class DocIDServer
 
 	private static int lastDocID;
 	private static boolean resumable;
+	private static final String dbName = "DocIDs";
 
 	public static void init(Environment env, boolean resumable) throws DatabaseException
 	{
@@ -45,7 +46,7 @@ public final class DocIDServer
 		dbConfig.setAllowCreate(true);
 		dbConfig.setTransactional(resumable);
 		dbConfig.setDeferredWrite(!resumable);
-		docIDsDB = env.openDatabase(null, "DocIDs", dbConfig);
+		docIDsDB = env.openDatabase(null,dbName, dbConfig);
 		if (resumable)
 		{
 			int docCount = getDocCount();
@@ -159,6 +160,17 @@ public final class DocIDServer
 			try
 			{
 				docIDsDB.close();
+
+				Environment env = docIDsDB.getEnvironment();
+
+				Transaction txn = env.beginTransaction(null, null);
+
+				long truncated = env.truncateDatabase(txn, dbName, true);
+				//env.removeDatabase(txn, dbName);
+
+				txn.commit();
+				System.out.println("truncated docIDsDB = " + truncated);
+
 			}
 			catch (DatabaseException e)
 			{

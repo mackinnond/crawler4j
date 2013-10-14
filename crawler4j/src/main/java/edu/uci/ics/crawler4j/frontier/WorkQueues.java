@@ -36,19 +36,23 @@ import edu.uci.ics.crawler4j.util.Util;
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public class WorkQueues {
+public class WorkQueues
+{
 
 	protected Database urlsDB = null;
 	protected Environment env;
 
 	private boolean resumable;
+	private String dbName;
 
 	private WebURLTupleBinding webURLBinding;
 
 	protected Object mutex = "WorkQueues_Mutex";
 
-	public WorkQueues(Environment env, String dbName, boolean resumable) throws DatabaseException {
+	public WorkQueues(Environment env, String dbName, boolean resumable) throws DatabaseException
+	{
 		this.env = env;
+		this.dbName = dbName;
 		this.resumable = resumable;
 		DatabaseConfig dbConfig = new DatabaseConfig();
 		dbConfig.setAllowCreate(true);
@@ -58,8 +62,10 @@ public class WorkQueues {
 		webURLBinding = new WebURLTupleBinding();
 	}
 
-	public List<WebURL> get(int max) throws DatabaseException {
-		synchronized (mutex) {
+	public List<WebURL> get(int max) throws DatabaseException
+	{
+		synchronized (mutex)
+		{
 			int matches = 0;
 			List<WebURL> results = new ArrayList<WebURL>(max);
 
@@ -68,34 +74,47 @@ public class WorkQueues {
 			DatabaseEntry key = new DatabaseEntry();
 			DatabaseEntry value = new DatabaseEntry();
 			Transaction txn;
-			if (resumable) {
+			if (resumable)
+			{
 				txn = env.beginTransaction(null, null);
-			} else {
+			}
+			else
+			{
 				txn = null;
 			}
-			try {
+			try
+			{
 				cursor = urlsDB.openCursor(txn, null);
 				result = cursor.getFirst(key, value, null);
 
-				while (matches < max && result == OperationStatus.SUCCESS) {
-					if (value.getData().length > 0) {
+				while (matches < max && result == OperationStatus.SUCCESS)
+				{
+					if (value.getData().length > 0)
+					{
 						WebURL curi = (WebURL) webURLBinding.entryToObject(value);
 						results.add(curi);
 						matches++;
 					}
 					result = cursor.getNext(key, value, null);
 				}
-			} catch (DatabaseException e) {
-				if (txn != null) {
+			}
+			catch (DatabaseException e)
+			{
+				if (txn != null)
+				{
 					txn.abort();
 					txn = null;
 				}
 				throw e;
-			} finally {
-				if (cursor != null) {
+			}
+			finally
+			{
+				if (cursor != null)
+				{
 					cursor.close();
 				}
-				if (txn != null) {
+				if (txn != null)
+				{
 					txn.commit();
 				}
 			}
@@ -103,8 +122,10 @@ public class WorkQueues {
 		}
 	}
 
-	public void delete(int count) throws DatabaseException {
-		synchronized (mutex) {
+	public void delete(int count) throws DatabaseException
+	{
+		synchronized (mutex)
+		{
 			int matches = 0;
 
 			Cursor cursor = null;
@@ -112,80 +133,121 @@ public class WorkQueues {
 			DatabaseEntry key = new DatabaseEntry();
 			DatabaseEntry value = new DatabaseEntry();
 			Transaction txn;
-			if (resumable) {
+			if (resumable)
+			{
 				txn = env.beginTransaction(null, null);
-			} else {
+			}
+			else
+			{
 				txn = null;
 			}
-			try {
+			try
+			{
 				cursor = urlsDB.openCursor(txn, null);
 				result = cursor.getFirst(key, value, null);
 
-				while (matches < count && result == OperationStatus.SUCCESS) {
+				while (matches < count && result == OperationStatus.SUCCESS)
+				{
 					cursor.delete();
 					matches++;
 					result = cursor.getNext(key, value, null);
 				}
-			} catch (DatabaseException e) {
-				if (txn != null) {
+			}
+			catch (DatabaseException e)
+			{
+				if (txn != null)
+				{
 					txn.abort();
 					txn = null;
 				}
 				throw e;
-			} finally {
-				if (cursor != null) {
+			}
+			finally
+			{
+				if (cursor != null)
+				{
 					cursor.close();
 				}
-				if (txn != null) {
+				if (txn != null)
+				{
 					txn.commit();
 				}
 			}
 		}
 	}
 
-	public void put(WebURL curi) throws DatabaseException {
+	public void put(WebURL curi) throws DatabaseException
+	{
 		byte[] keyData = Util.int2ByteArray(curi.getDocid());
 		DatabaseEntry value = new DatabaseEntry();
 		webURLBinding.objectToEntry(curi, value);
 		Transaction txn;
-		if (resumable) {
+		if (resumable)
+		{
 			txn = env.beginTransaction(null, null);
-		} else {
+		}
+		else
+		{
 			txn = null;
 		}
 		urlsDB.put(txn, new DatabaseEntry(keyData), value);
-		if (resumable) {
+		if (resumable)
+		{
 			txn.commit();
 		}
 	}
 
-	public long getLength() {
-		try {
+	public long getLength()
+	{
+		try
+		{
 			return urlsDB.count();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 		return -1;
 	}
 
-	public void sync() {
-		if (resumable) {
+	public void sync()
+	{
+		if (resumable)
+		{
 			return;
 		}
-		if (urlsDB == null) {
+		if (urlsDB == null)
+		{
 			return;
 		}
-		try {
+		try
+		{
 			urlsDB.sync();
-		} catch (DatabaseException e) {
+		}
+		catch (DatabaseException e)
+		{
 			e.printStackTrace();
 		}
 	}
 
-	public void close() {
-		try {
+	public void close()
+	{
+		try
+		{
 			urlsDB.close();
-		} catch (DatabaseException e) {
+			Environment env = urlsDB.getEnvironment();
+			Transaction txn = env.beginTransaction(null, null);
+
+			long truncated = env.truncateDatabase(txn, dbName, true);
+			// env.removeDatabase(txn, dbName);
+
+			txn.commit();
+
+			System.out.println("truncated urlsDB = " + truncated);
+
+		}
+		catch (DatabaseException e)
+		{
 			e.printStackTrace();
 		}
 	}
