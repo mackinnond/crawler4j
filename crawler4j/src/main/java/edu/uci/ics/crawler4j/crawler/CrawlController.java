@@ -103,10 +103,11 @@ public final class CrawlController
 		{
 			envHome.mkdir();
 		}
-		if (!resumable)
+		
+		/*if (!resumable)
 		{
 			IO.deleteFolderContents(envHome);
-		}
+		}*/
 
 		env = new Environment(envHome, envConfig);
 		Frontier.init(env, resumable);
@@ -171,8 +172,8 @@ public final class CrawlController
 				if (!someoneIsWorking)
 				{
 					// Make sure again that none of the threads are alive.
-					logger.info("It looks like no thread is working, waiting for 40 seconds to make sure...");
-					sleep(40);
+					logger.info("It looks like no thread is working, waiting for 20 seconds to make sure...");
+					sleep(20);
 
 					if (!isAnyThreadWorking())
 					{
@@ -181,8 +182,8 @@ public final class CrawlController
 						{
 							continue;
 						}
-						logger.info("No thread is working and no more URLs are in queue waiting for another 60 seconds to make sure...");
-						sleep(60);
+						logger.info("No thread is working and no more URLs are in queue waiting for another 20 seconds to make sure...");
+						sleep(20);
 						queueLength = Frontier.getQueueLength();
 						if (queueLength > 0)
 						{
@@ -356,13 +357,4 @@ public final class CrawlController
 		PageFetcher.setProxy(proxyHost, proxyPort, username, password);
 	}
 
-	/**
-	 * Close db.
-	 */
-	public void closeDB()
-	{
-		System.out.println("closeDB()");
-
-		env.close();
-	}
 }
