@@ -54,6 +54,11 @@ public final class Frontier
 	{
 		try
 		{
+			
+			// Init
+			isFinished = false;
+			scheduledPages = 0;
+			
 			workQueues = new WorkQueues(env, "PendingURLsDB", resumable);
 			if (resumable)
 			{
@@ -223,6 +228,8 @@ public final class Frontier
 		workQueues.close();
 		DocIDServer.close();
 		inprocessPages.close();
+		
+		
 	}
 
 	public static void finish()

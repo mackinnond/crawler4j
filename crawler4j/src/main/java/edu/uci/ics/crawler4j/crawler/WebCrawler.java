@@ -98,7 +98,9 @@ public class WebCrawler implements Runnable
 
 	public void run()
 	{
+		logger.info("run() ");
 		onStart();
+		
 		while (true)
 		{
 			List<WebURL> assignedURLs = new ArrayList<WebURL>(50);
@@ -148,6 +150,8 @@ public class WebCrawler implements Runnable
 
 	private int processPage(WebURL curURL)
 	{
+		logger.info("processPage() " + curURL.getURL());
+
 		if (curURL == null)
 		{
 			return -1;

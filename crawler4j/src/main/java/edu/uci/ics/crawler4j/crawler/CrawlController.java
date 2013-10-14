@@ -153,35 +153,37 @@ public final class CrawlController
 				threads.add(thread);
 				logger.info("Crawler " + i + " started.");
 			}
+
 			while (true)
 			{
 				sleep(10);
 				boolean someoneIsWorking = false;
+
 				for (int i = 0; i < threads.size(); i++)
 				{
 					Thread thread = threads.get(i);
 					if (!thread.isAlive())
 					{
-						logger.info("Thread " + i + " was dead, I'll recreate it.");
-						T crawler = _c.newInstance();
-						thread = new Thread(crawler, "Crawler " + (i + 1));
-						logger.info("Thread state3 = " + thread.getState().toString());
-						threads.remove(i);
-						threads.add(i, thread);
-						crawler.setThread(thread);
-						crawler.setMyId(i + 1);
-						crawler.setMyController(this);
-						thread.start();
-						logger.info("Thread state4 = " + thread.getState().toString());
-						crawlers.remove(i);
-						crawlers.add(i, crawler);
+						recreateThread(_c, crawlers, i);
 					}
 					else if (thread.getState() == State.RUNNABLE)
 					{
 						someoneIsWorking = true;
 						logger.info("Thread " + i + " was RUNNABLE.");
 					}
+					else if (thread.getState() == State.WAITING)
+					{
+						logger.info("Thread " + i + " was WAITING.");
+						//thread.interrupt();
+						//thread.join();
+					}
+					else
+					{
+						logger.info("Thread " + i + thread.getState().toString());
+						// recreateThread(_c, crawlers, i);
+					}
 				}
+
 				if (!someoneIsWorking)
 				{
 					// Make sure again that none of the threads are alive.
@@ -232,6 +234,12 @@ public final class CrawlController
 						{
 							Thread thread = threads.get(i);
 							logger.info("Thread state5 = " + thread.getState().toString());
+							if (thread.isAlive())
+							{
+								logger.info("Wait for live thread to die");
+								thread.join();
+							}
+
 						}
 						// PageFetcher.stopConnectionMonitorThread();
 						return;
@@ -243,6 +251,25 @@ public final class CrawlController
 		{
 			e.printStackTrace();
 		}
+	}
+
+	private <T extends WebCrawler> void recreateThread(Class<T> _c, List<T> crawlers, int i)
+			throws InstantiationException, IllegalAccessException
+	{
+		Thread thread;
+		logger.info("Thread " + i + " was dead, I'll recreate it.");
+		T crawler = _c.newInstance();
+		thread = new Thread(crawler, "Crawler " + (i + 1));
+		logger.info("Thread state3 = " + thread.getState().toString());
+		threads.remove(i);
+		threads.add(i, thread);
+		crawler.setThread(thread);
+		crawler.setMyId(i + 1);
+		crawler.setMyController(this);
+		thread.start();
+		logger.info("Thread state4 = " + thread.getState().toString());
+		crawlers.remove(i);
+		crawlers.add(i, crawler);
 	}
 
 	/**
