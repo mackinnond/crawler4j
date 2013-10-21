@@ -187,8 +187,8 @@ public final class CrawlController
 				if (!someoneIsWorking)
 				{
 					// Make sure again that none of the threads are alive.
-					logger.info("It looks like no thread is working, waiting for 20 seconds to make sure...");
-					sleep(20);
+					logger.info("It looks like no thread is working, waiting for 2 seconds to make sure...");
+					sleep(2);
 
 					if (!isAnyThreadWorking())
 					{
@@ -197,8 +197,8 @@ public final class CrawlController
 						{
 							continue;
 						}
-						logger.info("No thread is working and no more URLs are in queue waiting for another 20 seconds to make sure...");
-						sleep(20);
+						logger.info("No thread is working and no more URLs are in queue waiting for another 2 seconds to make sure...");
+						sleep(2);
 						queueLength = Frontier.getQueueLength();
 						if (queueLength > 0)
 						{
@@ -215,8 +215,8 @@ public final class CrawlController
 						// stop
 						// We will wait a few seconds for them and then return.
 						Frontier.finish();
-						logger.info("Waiting for 10 seconds before final clean up...");
-						sleep(10);
+						logger.info("Waiting for 2 seconds before final clean up...");
+						sleep(2);
 
 						try
 						{

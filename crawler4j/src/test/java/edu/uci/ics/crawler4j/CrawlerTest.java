@@ -1,7 +1,9 @@
 package edu.uci.ics.crawler4j;
 
+import java.io.File;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,20 +40,27 @@ public class CrawlerTest
 	@Test
 	public void test()
 	{
-		//String baseUrl = "http://www.fiat.co.uk/‎";
-		//String baseUrl = "http://www.zangbezang.com/";
-		//String baseUrl = "http://www.empowered-systems.com/";
-		String baseUrl = "http://www.citroen.co.uk/";
+		// String baseUrl = "http://www.fiat.co.uk/‎";
+		// String baseUrl = "http://www.zangbezang.com/";
+		String baseUrl = "http://www.empowered-systems.com/";
+		//String baseUrl = "http://www.citroen.co.uk/";
 		int maxDepth = 10;
 		int maxPagesToFetch = 100;
-		int numberOfCrawlers = 10;
+		int numberOfCrawlers = 2;
+		int maxWords = 2000;
 		String crawlStorageDir = "c://temp";
+
+
+		
 		List<Object> crawlersLocalData = null;
 
 		try
 		{
 
+			FileUtils.deleteDirectory(new File(crawlStorageDir + "/frontier"));
+
 			CrawlController controller = new CrawlController(crawlStorageDir);
+			//CrawlController controller = new CrawlController(crawlStorageDir, maxWords);
 			controller.addSeed(baseUrl);
 			controller.setMaximumCrawlDepth(maxDepth);
 			controller.setMaximumPagesToFetch(maxPagesToFetch);
@@ -59,14 +68,14 @@ public class CrawlerTest
 			controller.start(MyCrawler.class, numberOfCrawlers);
 
 			StringBuilder allPageText = new StringBuilder();
-			
+
 			crawlersLocalData = controller.getCrawlersLocalData();
-			for(Object obj : crawlersLocalData)
+			for (Object obj : crawlersLocalData)
 			{
-				CrawlStat  crawlStat = (CrawlStat) obj;
-				allPageText.append(crawlStat.getTextBuff().toString());				
+				CrawlStat crawlStat = (CrawlStat) obj;
+				allPageText.append(crawlStat.getTextBuff().toString());
 			}
-			
+
 			System.out.println("All text : " + allPageText.toString());
 		}
 		catch (Exception e)
