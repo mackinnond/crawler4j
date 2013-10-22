@@ -205,6 +205,7 @@ public final class DocIDServer
 			{
 				docIDsDB.close();
 
+				/*
 				Environment env = docIDsDB.getEnvironment();
 
 				Transaction txn = env.beginTransaction(null, null);
@@ -214,6 +215,7 @@ public final class DocIDServer
 
 				txn.commit();
 				System.out.println("truncated docIDsDB = " + truncated);
+				*/
 
 			}
 			catch (DatabaseException e)

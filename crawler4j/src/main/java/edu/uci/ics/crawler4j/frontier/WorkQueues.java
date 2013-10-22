@@ -294,6 +294,7 @@ public class WorkQueues
 		try
 		{
 			urlsDB.close();
+			/*
 			Environment env = urlsDB.getEnvironment();
 
 			Transaction txn = env.beginTransaction(null, null);
@@ -304,6 +305,7 @@ public class WorkQueues
 			txn.commit();
 
 			System.out.println("truncated urlsDB = " + truncated);
+			*/
 
 		}
 		catch (DatabaseException e)

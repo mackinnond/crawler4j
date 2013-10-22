@@ -301,7 +301,11 @@ public final class Frontier
 		sync();
 		workQueues.close();
 		DocIDServer.close();
-		inprocessPages.close();
+
+		if (inprocessPages != null)
+		{
+			inprocessPages.close();
+		}
 
 	}
 

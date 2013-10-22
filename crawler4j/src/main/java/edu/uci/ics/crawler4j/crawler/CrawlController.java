@@ -23,6 +23,7 @@ import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.sleepycat.je.Environment;
@@ -92,6 +93,8 @@ public final class CrawlController
 	 */
 	public CrawlController(String storageFolder, boolean resumable) throws Exception
 	{
+		FileUtils.deleteDirectory(new File(storageFolder + "/frontier"));
+
 		File folder = new File(storageFolder);
 		if (!folder.exists())
 		{
@@ -114,7 +117,9 @@ public final class CrawlController
 		 */
 
 		env = new Environment(envHome, envConfig);
+
 		Frontier.init(env, resumable);
+
 		DocIDServer.init(env, resumable);
 
 		PageFetcher.startConnectionMonitorThread();
@@ -134,6 +139,7 @@ public final class CrawlController
 	{
 		try
 		{
+
 			crawlersLocalData.clear();
 			threads = new ArrayList<Thread>();
 			List<T> crawlers = new ArrayList<T>();

@@ -56,10 +56,7 @@ public class CrawlerTest
 
 		try
 		{
-
-			FileUtils.deleteDirectory(new File(crawlStorageDir + "/frontier"));
-
-			CrawlController controller = new CrawlController(crawlStorageDir);
+			CrawlController controller = new CrawlController(crawlStorageDir, false);
 			//CrawlController controller = new CrawlController(crawlStorageDir, maxWords);
 			controller.addSeed(baseUrl);
 			controller.setMaximumCrawlDepth(maxDepth);
@@ -76,7 +73,8 @@ public class CrawlerTest
 				allPageText.append(crawlStat.getTextBuff().toString());
 			}
 
-			System.out.println("All text : " + allPageText.toString());
+			//System.out.println("All text : " + allPageText.toString());
+			System.out.println("All text size: " + allPageText.toString().length());
 		}
 		catch (Exception e)
 		{
