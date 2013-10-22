@@ -19,56 +19,103 @@ package edu.uci.ics.crawler4j.example.imagecrawler;
 
 import java.security.MessageDigest;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class Cryptography.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public final class Cryptography {
+public final class Cryptography
+{
 
-	private static final char[] hexChars = { '0', '1', '2', '3', '4', '5', '6',
-			'7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+	/** The Constant hexChars. */
+	private static final char[] hexChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
+			'f' };
 
-	public static String MD5(String str) {
-		try {
+	/**
+	 * M d5.
+	 * 
+	 * @param str
+	 *            the str
+	 * @return the string
+	 */
+	public static String MD5(String str)
+	{
+		try
+		{
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(str.getBytes());
 			return hexStringFromBytes(md.digest());
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 			return "";
 		}
 	}
 
-	public static String MD5(byte[] source) {
-		try {
+	/**
+	 * M d5.
+	 * 
+	 * @param source
+	 *            the source
+	 * @return the string
+	 */
+	public static String MD5(byte[] source)
+	{
+		try
+		{
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(source);
 			return hexStringFromBytes(md.digest());
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 			return "";
 		}
 	}
 
-	public static byte[] MD5bytes(String str) {
-		try {
+	/**
+	 * M d5bytes.
+	 * 
+	 * @param str
+	 *            the str
+	 * @return the byte[]
+	 */
+	public static byte[] MD5bytes(String str)
+	{
+		try
+		{
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(str.getBytes());
 			return md.digest();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	private static String hexStringFromBytes(byte[] b) {
+	/**
+	 * Hex string from bytes.
+	 * 
+	 * @param b
+	 *            the b
+	 * @return the string
+	 */
+	private static String hexStringFromBytes(byte[] b)
+	{
 		String hex = "";
 		int msb;
 		int lsb = 0;
 		int i;
 
 		// MSB maps to idx 0
-		for (i = 0; i < b.length; i++) {
+		for (i = 0; i < b.length; i++)
+		{
 			msb = ((int) b[i] & 0x000000FF) / 16;
 			lsb = ((int) b[i] & 0x000000FF) % 16;
 			hex = hex + hexChars[msb] + hexChars[lsb];

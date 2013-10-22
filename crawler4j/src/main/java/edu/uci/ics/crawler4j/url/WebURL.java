@@ -22,71 +22,149 @@ import java.io.*;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class WebURL.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-
 @Entity
-public final class WebURL implements Serializable {
+public final class WebURL implements Serializable
+{
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
-	
+
+	/** The url. */
 	@PrimaryKey
 	private String url;
+
+	/** The docid. */
 	private int docid;
+
+	/** The parent docid. */
 	private int parentDocid;
+
+	/** The depth. */
 	private short depth;
-	
-	public int getDocid() {
+
+	/**
+	 * Gets the docid.
+	 * 
+	 * @return the docid
+	 */
+	public int getDocid()
+	{
 		return docid;
 	}
 
-	public void setDocid(int docid) {
+	/**
+	 * Sets the docid.
+	 * 
+	 * @param docid
+	 *            the new docid
+	 */
+	public void setDocid(int docid)
+	{
 		this.docid = docid;
 	}
 
-	public String getURL() {
+	/**
+	 * Gets the url.
+	 * 
+	 * @return the url
+	 */
+	public String getURL()
+	{
 		return url;
 	}
 
-	public boolean equals(Object o) {
-		if (this == o) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (o == null || getClass() != o.getClass())
+		{
 			return false;
 		}
 
 		WebURL url2 = (WebURL) o;
-		if (url == null) {
+		if (url == null)
+		{
 			return false;
 		}
 		return url.equals(url2.getURL());
 
 	}
 
-	public String toString() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
 		return url;
 	}
 
-	public void setURL(String url) {
+	/**
+	 * Sets the url.
+	 * 
+	 * @param url
+	 *            the new url
+	 */
+	public void setURL(String url)
+	{
 		this.url = url;
 	}
-	
-	public int getParentDocid() {
+
+	/**
+	 * Gets the parent docid.
+	 * 
+	 * @return the parent docid
+	 */
+	public int getParentDocid()
+	{
 		return parentDocid;
 	}
 
-	public void setParentDocid(int parentDocid) {
+	/**
+	 * Sets the parent docid.
+	 * 
+	 * @param parentDocid
+	 *            the new parent docid
+	 */
+	public void setParentDocid(int parentDocid)
+	{
 		this.parentDocid = parentDocid;
 	}
-	
-	public short getDepth() {
+
+	/**
+	 * Gets the depth.
+	 * 
+	 * @return the depth
+	 */
+	public short getDepth()
+	{
 		return depth;
 	}
 
-	public void setDepth(short depth) {
+	/**
+	 * Sets the depth.
+	 * 
+	 * @param depth
+	 *            the new depth
+	 */
+	public void setDepth(short depth)
+	{
 		this.depth = depth;
 	}
 }

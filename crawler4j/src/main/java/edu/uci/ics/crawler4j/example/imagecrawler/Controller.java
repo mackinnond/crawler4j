@@ -19,19 +19,32 @@ package edu.uci.ics.crawler4j.example.imagecrawler;
 
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class Controller.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
 /*
-* IMPORTANT: Make sure that you update crawler4j.properties file and 
-*            set crawler.include_images to true           
-*/
+ * IMPORTANT: Make sure that you update crawler4j.properties file and set crawler.include_images to true
+ */
 
-public class Controller {
+public class Controller
+{
 
-	public static void main(String[] args) throws Exception {
-		if (args.length < 3) {
+	/**
+	 * The main method.
+	 * 
+	 * @param args
+	 *            the arguments
+	 * @throws Exception
+	 *             the exception
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		if (args.length < 3)
+		{
 			System.out.println("Needed parameters: ");
 			System.out.println("\t rootFolder (it will contain intermediate crawl data)");
 			System.out.println("\t numberOfCralwers (number of concurrent threads)");
@@ -45,7 +58,8 @@ public class Controller {
 		String[] crawlDomains = new String[] { "http://uci.edu/" };
 
 		CrawlController controller = new CrawlController(rootFolder);
-		for (String domain : crawlDomains) {
+		for (String domain : crawlDomains)
+		{
 			controller.addSeed(domain);
 		}
 

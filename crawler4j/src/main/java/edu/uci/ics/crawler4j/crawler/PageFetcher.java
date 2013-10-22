@@ -51,7 +51,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
 // TODO: Auto-generated Javadoc
 /**
  * The Class PageFetcher.
- *
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
@@ -72,10 +72,10 @@ public final class PageFetcher
 
 	/** The processed count. */
 	private static int processedCount = 0;
-	
+
 	/** The start of period. */
 	private static long startOfPeriod = 0;
-	
+
 	/** The last fetch time. */
 	private static long lastFetchTime = 0;
 
@@ -93,7 +93,7 @@ public final class PageFetcher
 
 	/**
 	 * Gets the politeness delay.
-	 *
+	 * 
 	 * @return the politeness delay
 	 */
 	public static long getPolitenessDelay()
@@ -103,14 +103,14 @@ public final class PageFetcher
 
 	/**
 	 * Sets the politeness delay.
-	 *
-	 * @param politenessDelay the new politeness delay
+	 * 
+	 * @param politenessDelay
+	 *            the new politeness delay
 	 */
 	public static void setPolitenessDelay(long politenessDelay)
 	{
 		PageFetcher.politenessDelay = politenessDelay;
 	}
-
 
 	/**
 	 * Inits the connnection manager.
@@ -162,13 +162,11 @@ public final class PageFetcher
 		System.out.println("startConnectionMonitorThread()");
 
 		// Stop and restart thread if already running!
-		/*if (connectionMonitorThread != null)
-		{
-			connectionManager.shutdown();
-			connectionMonitorThread.shutdown();
-		}*/
+		/*
+		 * if (connectionMonitorThread != null) { connectionManager.shutdown(); connectionMonitorThread.shutdown(); }
+		 */
 		initConnnectionManager();
-		
+
 		connectionMonitorThread = new IdleConnectionMonitorThread(connectionManager);
 
 		connectionMonitorThread.start();
@@ -180,23 +178,25 @@ public final class PageFetcher
 	public synchronized static void stopConnectionMonitorThread()
 	{
 		System.out.println("stopConnectionMonitorThread()");
-		
+
 		if (connectionMonitorThread != null)
 		{
 			System.out.println("\t connectionManager.shutdown");
 
 			connectionManager.shutdown();
 			connectionMonitorThread.shutdown();
-			
-			//initConnnectionManager();
+
+			// initConnnectionManager();
 		}
 	}
 
 	/**
 	 * Fetch.
-	 *
-	 * @param page the page
-	 * @param ignoreIfBinary the ignore if binary
+	 * 
+	 * @param page
+	 *            the page
+	 * @param ignoreIfBinary
+	 *            the ignore if binary
 	 * @return the int
 	 */
 	public static int fetch(Page page, boolean ignoreIfBinary)
@@ -378,9 +378,11 @@ public final class PageFetcher
 
 	/**
 	 * Sets the proxy.
-	 *
-	 * @param proxyHost the proxy host
-	 * @param proxyPort the proxy port
+	 * 
+	 * @param proxyHost
+	 *            the proxy host
+	 * @param proxyPort
+	 *            the proxy port
 	 */
 	public static void setProxy(String proxyHost, int proxyPort)
 	{
@@ -390,11 +392,15 @@ public final class PageFetcher
 
 	/**
 	 * Sets the proxy.
-	 *
-	 * @param proxyHost the proxy host
-	 * @param proxyPort the proxy port
-	 * @param username the username
-	 * @param password the password
+	 * 
+	 * @param proxyHost
+	 *            the proxy host
+	 * @param proxyPort
+	 *            the proxy port
+	 * @param username
+	 *            the username
+	 * @param password
+	 *            the password
 	 */
 	public static void setProxy(String proxyHost, int proxyPort, String username, String password)
 	{

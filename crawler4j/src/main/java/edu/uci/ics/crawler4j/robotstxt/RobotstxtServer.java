@@ -29,66 +29,112 @@ import edu.uci.ics.crawler4j.crawler.PageFetchStatus;
 import edu.uci.ics.crawler4j.crawler.PageFetcher;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class RobotstxtServer.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
+public class RobotstxtServer
+{
 
-public class RobotstxtServer {
-	
+	/** The host2directives. */
 	private static Map<String, HostDirectives> host2directives = new HashMap<String, HostDirectives>();
-	
-	private static final String USER_AGENT_NAME = Configurations.getStringProperty("fetcher.user_agent_name", "crawler4j");
+
+	/** The Constant USER_AGENT_NAME. */
+	private static final String USER_AGENT_NAME = Configurations.getStringProperty("fetcher.user_agent_name",
+			"crawler4j");
+
+	/** The Constant MAX_MAP_SIZE. */
 	private static final int MAX_MAP_SIZE = Configurations.getIntProperty("crawler.robotstxt.max_map_size", 100);
+
+	/** The active. */
 	private static boolean active = Configurations.getBooleanProperty("crawler.obey_robotstxt", false);
-	private static final Object mutex = RobotstxtServer.class.toString() + "_MUTEX"; 
-	
-	public static boolean allows(WebURL webURL) {
-		if (!active) {
+
+	/** The Constant mutex. */
+	private static final Object mutex = RobotstxtServer.class.toString() + "_MUTEX";
+
+	/**
+	 * Allows.
+	 * 
+	 * @param webURL
+	 *            the web url
+	 * @return true, if successful
+	 */
+	public static boolean allows(WebURL webURL)
+	{
+		if (!active)
+		{
 			return true;
 		}
-		try {
+		try
+		{
 			URL url = new URL(webURL.getURL());
 			String host = url.getHost().toLowerCase();
 			String path = url.getPath();
-			
+
 			HostDirectives directives = host2directives.get(host);
-			if (directives == null) {
+			if (directives == null)
+			{
 				directives = fetchDirectives(host);
-			} 
-			return directives.allows(path);			
-		} catch (MalformedURLException e) {			
+			}
+			return directives.allows(path);
+		}
+		catch (MalformedURLException e)
+		{
 			e.printStackTrace();
 		}
 		return true;
 	}
-	
-	public static void setActive(boolean active) {
+
+	/**
+	 * Sets the active.
+	 * 
+	 * @param active
+	 *            the new active
+	 */
+	public static void setActive(boolean active)
+	{
 		RobotstxtServer.active = active;
 	}
-	
-	private static HostDirectives fetchDirectives(String host) {
+
+	/**
+	 * Fetch directives.
+	 * 
+	 * @param host
+	 *            the host
+	 * @return the host directives
+	 */
+	private static HostDirectives fetchDirectives(String host)
+	{
 		WebURL robotsTxt = new WebURL();
 		robotsTxt.setURL("http://" + host + "/robots.txt");
 		Page page = new Page(robotsTxt);
 		int statusCode = PageFetcher.fetch(page, true);
 		HostDirectives directives = null;
-		if (statusCode == PageFetchStatus.OK) {
-			directives = RobotstxtParser.parse(page.getHTML(), USER_AGENT_NAME);			
+		if (statusCode == PageFetchStatus.OK)
+		{
+			directives = RobotstxtParser.parse(page.getHTML(), USER_AGENT_NAME);
 		}
-		if (directives == null) {
+		if (directives == null)
+		{
 			// We still need to have this object to keep track of the time we fetched it
 			directives = new HostDirectives();
 		}
-		synchronized (mutex) {
-			if (host2directives.size() == MAX_MAP_SIZE) {
+		synchronized (mutex)
+		{
+			if (host2directives.size() == MAX_MAP_SIZE)
+			{
 				String minHost = null;
 				long minAccessTime = Long.MAX_VALUE;
-				for (Entry<String, HostDirectives> entry : host2directives.entrySet()) {
-					if (entry.getValue().getLastAccessTime() < minAccessTime) {
+				for (Entry<String, HostDirectives> entry : host2directives.entrySet())
+				{
+					if (entry.getValue().getLastAccessTime() < minAccessTime)
+					{
 						minAccessTime = entry.getValue().getLastAccessTime();
 						minHost = entry.getKey();
-					}					
+					}
 				}
 				host2directives.remove(minHost);
 			}

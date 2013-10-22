@@ -17,47 +17,97 @@
 
 package edu.uci.ics.crawler4j.robotstxt;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class HostDirectives.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public class HostDirectives {
+public class HostDirectives
+{
 
 	// If we fetched the directives for this host more than
 	// 24 hours, we have to refetch it.
+	/** The Constant EXPIRATION_DELAY. */
 	private static final long EXPIRATION_DELAY = 24 * 60 * 1000L;
 
+	/** The disallows. */
 	private RuleSet disallows = new RuleSet();
+
+	/** The allows. */
 	private RuleSet allows = new RuleSet();
 
+	/** The time fetched. */
 	private long timeFetched;
+
+	/** The time last accessed. */
 	private long timeLastAccessed;
 
-	public HostDirectives() {
+	/**
+	 * Instantiates a new host directives.
+	 */
+	public HostDirectives()
+	{
 		timeFetched = System.currentTimeMillis();
 	}
 
-	public boolean needsRefetch() {
+	/**
+	 * Needs refetch.
+	 * 
+	 * @return true, if successful
+	 */
+	public boolean needsRefetch()
+	{
 		return (System.currentTimeMillis() - timeFetched > EXPIRATION_DELAY);
 	}
 
-	public boolean allows(String path) {
+	/**
+	 * Allows.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return true, if successful
+	 */
+	public boolean allows(String path)
+	{
 		timeLastAccessed = System.currentTimeMillis();
-		if (disallows.containsPrefixOf(path)) {
+		if (disallows.containsPrefixOf(path))
+		{
 			return allows.containsPrefixOf(path);
 		}
 		return true;
 	}
 
-	public void addDisallow(String path) {
+	/**
+	 * Adds the disallow.
+	 * 
+	 * @param path
+	 *            the path
+	 */
+	public void addDisallow(String path)
+	{
 		disallows.add(path);
 	}
 
-	public void addAllow(String path) {
+	/**
+	 * Adds the allow.
+	 * 
+	 * @param path
+	 *            the path
+	 */
+	public void addAllow(String path)
+	{
 		allows.add(path);
 	}
-	
-	public long getLastAccessTime() {
+
+	/**
+	 * Gets the last access time.
+	 * 
+	 * @return the last access time
+	 */
+	public long getLastAccessTime()
+	{
 		return timeLastAccessed;
 	}
 }

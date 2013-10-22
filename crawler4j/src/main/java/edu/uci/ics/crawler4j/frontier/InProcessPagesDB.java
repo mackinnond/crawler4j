@@ -29,59 +29,93 @@ import com.sleepycat.je.Transaction;
 import edu.uci.ics.crawler4j.url.WebURL;
 import edu.uci.ics.crawler4j.util.Util;
 
+// TODO: Auto-generated Javadoc
 /**
- * This class maintains the list of pages which are
- * assigned to crawlers but are not yet processed.
- * It is used for resuming a previous crawl. 
+ * This class maintains the list of pages which are assigned to crawlers but are not yet processed. It is used for
+ * resuming a previous crawl.
  * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public final class InProcessPagesDB extends WorkQueues {
+public final class InProcessPagesDB extends WorkQueues
+{
 
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(InProcessPagesDB.class.getName());
-		
-	public InProcessPagesDB(Environment env) throws DatabaseException {
+
+	/**
+	 * Instantiates a new in process pages db.
+	 * 
+	 * @param env
+	 *            the env
+	 * @throws DatabaseException
+	 *             the database exception
+	 */
+	public InProcessPagesDB(Environment env) throws DatabaseException
+	{
 		super(env, "InProcessPagesDB", true);
 		long docCount = getLength();
-		if (docCount > 0) {
+		if (docCount > 0)
+		{
 			logger.info("Loaded " + docCount + " URLs that have been in process in the previous crawl.");
 		}
 	}
 
-	public boolean removeURL(WebURL webUrl) {
-		synchronized (mutex) {
-			try {
-				DatabaseEntry key = new DatabaseEntry(Util.int2ByteArray(webUrl.getDocid()));				
+	/**
+	 * Removes the url.
+	 * 
+	 * @param webUrl
+	 *            the web url
+	 * @return true, if successful
+	 */
+	public boolean removeURL(WebURL webUrl)
+	{
+		synchronized (mutex)
+		{
+			try
+			{
+				DatabaseEntry key = new DatabaseEntry(Util.int2ByteArray(webUrl.getDocid()));
 				Cursor cursor = null;
 				OperationStatus result = null;
 				DatabaseEntry value = new DatabaseEntry();
 				Transaction txn = env.beginTransaction(null, null);
-				try {
+				try
+				{
 					cursor = urlsDB.openCursor(txn, null);
 					result = cursor.getSearchKey(key, value, null);
-					
-					if (result == OperationStatus.SUCCESS) {
+
+					if (result == OperationStatus.SUCCESS)
+					{
 						result = cursor.delete();
-						if (result == OperationStatus.SUCCESS) {
+						if (result == OperationStatus.SUCCESS)
+						{
 							return true;
 						}
 					}
-				} catch (DatabaseException e) {
-					if (txn != null) {
+				}
+				catch (DatabaseException e)
+				{
+					if (txn != null)
+					{
 						txn.abort();
 						txn = null;
 					}
 					throw e;
-				} finally {
-					if (cursor != null) {
+				}
+				finally
+				{
+					if (cursor != null)
+					{
 						cursor.close();
 					}
-					if (txn != null) {
+					if (txn != null)
+					{
 						txn.commit();
 					}
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}

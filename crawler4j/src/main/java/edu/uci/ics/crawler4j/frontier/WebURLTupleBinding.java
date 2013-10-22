@@ -23,14 +23,24 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 import edu.uci.ics.crawler4j.url.WebURL;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class WebURLTupleBinding.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public final class WebURLTupleBinding extends TupleBinding<WebURL> {
+public final class WebURLTupleBinding extends TupleBinding<WebURL>
+{
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
+	 */
 	@Override
-	public WebURL entryToObject(TupleInput input) {
+	public WebURL entryToObject(TupleInput input)
+	{
 		WebURL webURL = new WebURL();
 		webURL.setURL(input.readString());
 		webURL.setDocid(input.readInt());
@@ -39,8 +49,14 @@ public final class WebURLTupleBinding extends TupleBinding<WebURL> {
 		return webURL;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
+	 */
 	@Override
-	public void objectToEntry(WebURL url, TupleOutput output) {		
+	public void objectToEntry(WebURL url, TupleOutput output)
+	{
 		output.writeString(url.getURL());
 		output.writeInt(url.getDocid());
 		output.writeInt(url.getParentDocid());

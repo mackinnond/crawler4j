@@ -23,22 +23,44 @@ import com.sleepycat.je.*;
 
 import edu.uci.ics.crawler4j.util.Util;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class DocIDServer.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
 public final class DocIDServer
 {
 
+	/** The doc i ds db. */
 	private static Database docIDsDB = null;
 
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(DocIDServer.class.getName());
+
+	/** The mutex. */
 	private static Object mutex = "DocIDServer_Mutex";
 
+	/** The last doc id. */
 	private static int lastDocID;
+
+	/** The resumable. */
 	private static boolean resumable;
+
+	/** The Constant dbName. */
 	private static final String dbName = "DocIDs";
 
+	/**
+	 * Inits the.
+	 * 
+	 * @param env
+	 *            the env
+	 * @param resumable
+	 *            the resumable
+	 * @throws DatabaseException
+	 *             the database exception
+	 */
 	public static void init(Environment env, boolean resumable) throws DatabaseException
 	{
 		DocIDServer.resumable = resumable;
@@ -46,7 +68,7 @@ public final class DocIDServer
 		dbConfig.setAllowCreate(true);
 		dbConfig.setTransactional(resumable);
 		dbConfig.setDeferredWrite(!resumable);
-		docIDsDB = env.openDatabase(null,dbName, dbConfig);
+		docIDsDB = env.openDatabase(null, dbName, dbConfig);
 		if (resumable)
 		{
 			int docCount = getDocCount();
@@ -64,6 +86,10 @@ public final class DocIDServer
 
 	/**
 	 * Returns the docid of an already seen url. If url is not seen before, it will return -1
+	 * 
+	 * @param url
+	 *            the url
+	 * @return the doc id
 	 */
 	public static int getDocID(String url)
 	{
@@ -94,6 +120,13 @@ public final class DocIDServer
 		}
 	}
 
+	/**
+	 * Gets the new doc id.
+	 * 
+	 * @param url
+	 *            the url
+	 * @return the new doc id
+	 */
 	public static int getNewDocID(String url)
 	{
 		synchronized (mutex)
@@ -119,6 +152,11 @@ public final class DocIDServer
 		}
 	}
 
+	/**
+	 * Gets the doc count.
+	 * 
+	 * @return the doc count
+	 */
 	public static int getDocCount()
 	{
 		try
@@ -132,6 +170,9 @@ public final class DocIDServer
 		return -1;
 	}
 
+	/**
+	 * Sync.
+	 */
 	public static void sync()
 	{
 		if (resumable)
@@ -152,6 +193,9 @@ public final class DocIDServer
 		}
 	}
 
+	/**
+	 * Close.
+	 */
 	public static void close()
 	{
 		if (docIDsDB != null)
@@ -166,7 +210,7 @@ public final class DocIDServer
 				Transaction txn = env.beginTransaction(null, null);
 
 				long truncated = env.truncateDatabase(txn, dbName, true);
-				//env.removeDatabase(txn, dbName);
+				// env.removeDatabase(txn, dbName);
 
 				txn.commit();
 				System.out.println("truncated docIDsDB = " + truncated);

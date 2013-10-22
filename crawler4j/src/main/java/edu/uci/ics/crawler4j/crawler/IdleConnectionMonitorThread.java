@@ -21,40 +21,70 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
-public class IdleConnectionMonitorThread extends Thread {
-    
-    private final ThreadSafeClientConnManager connMgr;
-    private volatile boolean shutdown;
-    
-    public IdleConnectionMonitorThread(ThreadSafeClientConnManager connMgr) {
-        super("Connection Manager");
-        this.connMgr = connMgr;
-    }
+// TODO: Auto-generated Javadoc
+/**
+ * The Class IdleConnectionMonitorThread.
+ */
+public class IdleConnectionMonitorThread extends Thread
+{
 
-    @Override
-    public void run() {
-        try {
-            while (!shutdown) {
-                synchronized (this) {
-                    wait(5000);
-                    // Close expired connections
-                    connMgr.closeExpiredConnections();
-                    // Optionally, close connections
-                    // that have been idle longer than 30 sec
-                    connMgr.closeIdleConnections(30, TimeUnit.SECONDS);
-                }
-            }
-        } catch (InterruptedException ex) {
-            // terminate
-        }
-    }
-    
-    public void shutdown() {
-        shutdown = true;
-        synchronized (this) {
-            notifyAll();
-        }
-    }
-    
+	/** The conn mgr. */
+	private final ThreadSafeClientConnManager connMgr;
+
+	/** The shutdown. */
+	private volatile boolean shutdown;
+
+	/**
+	 * Instantiates a new idle connection monitor thread.
+	 * 
+	 * @param connMgr
+	 *            the conn mgr
+	 */
+	public IdleConnectionMonitorThread(ThreadSafeClientConnManager connMgr)
+	{
+		super("Connection Manager");
+		this.connMgr = connMgr;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
+	@Override
+	public void run()
+	{
+		try
+		{
+			while (!shutdown)
+			{
+				synchronized (this)
+				{
+					wait(5000);
+					// Close expired connections
+					connMgr.closeExpiredConnections();
+					// Optionally, close connections
+					// that have been idle longer than 30 sec
+					connMgr.closeIdleConnections(30, TimeUnit.SECONDS);
+				}
+			}
+		}
+		catch (InterruptedException ex)
+		{
+			// terminate
+		}
+	}
+
+	/**
+	 * Shutdown.
+	 */
+	public void shutdown()
+	{
+		shutdown = true;
+		synchronized (this)
+		{
+			notifyAll();
+		}
+	}
+
 }
-

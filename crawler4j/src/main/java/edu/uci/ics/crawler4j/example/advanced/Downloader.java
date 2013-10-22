@@ -23,36 +23,62 @@ import edu.uci.ics.crawler4j.crawler.PageFetchStatus;
 import edu.uci.ics.crawler4j.crawler.PageFetcher;
 import edu.uci.ics.crawler4j.url.WebURL;
 
-public class Downloader {
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Downloader.
+ */
+public class Downloader
+{
 
-	// This class is not currently used and is only a demonstration of how 
+	// This class is not currently used and is only a demonstration of how
 	// the crawler4j infrastructure can be used to download a single page
 	// and extract its title and text
-	
+
+	/** The html parser. */
 	private HTMLParser htmlParser = new HTMLParser();
 
-	public Page download(String url) {
+	/**
+	 * Download.
+	 * 
+	 * @param url
+	 *            the url
+	 * @return the page
+	 */
+	public Page download(String url)
+	{
 		WebURL curURL = new WebURL();
 		curURL.setURL(url);
 		Page page = new Page(curURL);
 		int statusCode = PageFetcher.fetch(page, true);
-		if (statusCode == PageFetchStatus.OK) {
-			try {
+		if (statusCode == PageFetchStatus.OK)
+		{
+			try
+			{
 				htmlParser.parse(page.getHTML(), curURL.getURL());
 				page.setText(htmlParser.getText());
 				page.setTitle(htmlParser.getTitle());
 				return page;
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 		return null;
 	}
-	
-	public static void main(String[] args) {
+
+	/**
+	 * The main method.
+	 * 
+	 * @param args
+	 *            the arguments
+	 */
+	public static void main(String[] args)
+	{
 		Downloader myDownloader = new Downloader();
 		Page page = myDownloader.download("http://ics.uci.edu");
-		if (page != null) {
+		if (page != null)
+		{
 			System.out.println(page.getText());
 		}
 	}

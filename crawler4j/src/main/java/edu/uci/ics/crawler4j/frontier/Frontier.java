@@ -28,37 +28,57 @@ import com.sleepycat.je.Environment;
 import edu.uci.ics.crawler4j.crawler.Configurations;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class Frontier.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
 public final class Frontier
 {
 
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(Frontier.class.getName());
 
+	/** The work queues. */
 	private static WorkQueues workQueues;
+
+	/** The inprocess pages. */
 	private static InProcessPagesDB inprocessPages;
 
+	/** The mutex. */
 	private static Object mutex = Frontier.class.toString() + "_Mutex";
 
+	/** The waiting list. */
 	private static Object waitingList = Frontier.class.toString() + "_WaitingList";
 
+	/** The is finished. */
 	private static boolean isFinished = false;
 
+	/** The max pages to fetch. */
 	private static int maxPagesToFetch = Configurations.getIntProperty("crawler.max_pages_to_fetch", -1);
 
+	/** The scheduled pages. */
 	private static int scheduledPages;
 
+	/**
+	 * Inits the.
+	 * 
+	 * @param env
+	 *            the env
+	 * @param resumable
+	 *            the resumable
+	 */
 	public static void init(Environment env, boolean resumable)
 	{
 		try
 		{
-			
+
 			// Init
 			isFinished = false;
 			scheduledPages = 0;
-			
+
 			workQueues = new WorkQueues(env, "PendingURLsDB", resumable);
 			if (resumable)
 			{
@@ -92,6 +112,12 @@ public final class Frontier
 		}
 	}
 
+	/**
+	 * Schedule all.
+	 * 
+	 * @param urls
+	 *            the urls
+	 */
 	public static void scheduleAll(List<WebURL> urls)
 	{
 		synchronized (mutex)
@@ -120,6 +146,12 @@ public final class Frontier
 		}
 	}
 
+	/**
+	 * Schedule.
+	 * 
+	 * @param url
+	 *            the url
+	 */
 	public static void schedule(WebURL url)
 	{
 		synchronized (mutex)
@@ -139,6 +171,15 @@ public final class Frontier
 		}
 	}
 
+	/**
+	 * Gets the next ur ls.
+	 * 
+	 * @param max
+	 *            the max
+	 * @param result
+	 *            the result
+	 * @return the next ur ls
+	 */
 	public static void getNextURLs(int max, List<WebURL> result)
 	{
 		while (true)
@@ -185,6 +226,12 @@ public final class Frontier
 		}
 	}
 
+	/**
+	 * Sets the processed.
+	 * 
+	 * @param webURL
+	 *            the new processed
+	 */
 	public static void setProcessed(WebURL webURL)
 	{
 		if (inprocessPages != null)
@@ -196,42 +243,71 @@ public final class Frontier
 		}
 	}
 
+	/**
+	 * Gets the queue length.
+	 * 
+	 * @return the queue length
+	 */
 	public static long getQueueLength()
 	{
 		return workQueues.getLength();
 	}
 
+	/**
+	 * Gets the number of assigned pages.
+	 * 
+	 * @return the number of assigned pages
+	 */
 	public static long getNumberOfAssignedPages()
 	{
 		return inprocessPages.getLength();
 	}
 
+	/**
+	 * Sync.
+	 */
 	public static void sync()
 	{
 		workQueues.sync();
 		DocIDServer.sync();
 	}
 
+	/**
+	 * Checks if is finished.
+	 * 
+	 * @return true, if is finished
+	 */
 	public static boolean isFinished()
 	{
 		return isFinished;
 	}
 
+	/**
+	 * Sets the maximum pages to fetch.
+	 * 
+	 * @param max
+	 *            the new maximum pages to fetch
+	 */
 	public static void setMaximumPagesToFetch(int max)
 	{
 		maxPagesToFetch = max;
 	}
 
+	/**
+	 * Close.
+	 */
 	public static void close()
 	{
 		sync();
 		workQueues.close();
 		DocIDServer.close();
 		inprocessPages.close();
-		
-		
+
 	}
 
+	/**
+	 * Finish.
+	 */
 	public static void finish()
 	{
 		isFinished = true;

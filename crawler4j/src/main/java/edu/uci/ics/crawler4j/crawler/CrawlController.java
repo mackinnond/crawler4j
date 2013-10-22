@@ -174,8 +174,8 @@ public final class CrawlController
 					else if (thread.getState() == State.WAITING)
 					{
 						logger.info("Thread " + i + " was WAITING.");
-						//thread.interrupt();
-						//thread.join();
+						// thread.interrupt();
+						// thread.join();
 					}
 					else
 					{
@@ -187,8 +187,8 @@ public final class CrawlController
 				if (!someoneIsWorking)
 				{
 					// Make sure again that none of the threads are alive.
-					logger.info("It looks like no thread is working, waiting for 2 seconds to make sure...");
-					sleep(2);
+					logger.info("It looks like no thread is working, waiting for 1 second to make sure...");
+					sleep(1);
 
 					if (!isAnyThreadWorking())
 					{
@@ -197,8 +197,8 @@ public final class CrawlController
 						{
 							continue;
 						}
-						logger.info("No thread is working and no more URLs are in queue waiting for another 2 seconds to make sure...");
-						sleep(2);
+						logger.info("No thread is working and no more URLs are in queue waiting for another 1 second to make sure...");
+						sleep(1);
 						queueLength = Frontier.getQueueLength();
 						if (queueLength > 0)
 						{
@@ -215,8 +215,8 @@ public final class CrawlController
 						// stop
 						// We will wait a few seconds for them and then return.
 						Frontier.finish();
-						logger.info("Waiting for 2 seconds before final clean up...");
-						sleep(2);
+						logger.info("Waiting for 1 second before final clean up...");
+						sleep(1);
 
 						try
 						{
@@ -253,6 +253,22 @@ public final class CrawlController
 		}
 	}
 
+	/**
+	 * Recreate thread.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param _c
+	 *            the _c
+	 * @param crawlers
+	 *            the crawlers
+	 * @param i
+	 *            the i
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 */
 	private <T extends WebCrawler> void recreateThread(Class<T> _c, List<T> crawlers, int i)
 			throws InstantiationException, IllegalAccessException
 	{

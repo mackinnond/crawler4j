@@ -32,23 +32,46 @@ import com.sleepycat.je.Transaction;
 import edu.uci.ics.crawler4j.url.WebURL;
 import edu.uci.ics.crawler4j.util.Util;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class WorkQueues.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
 public class WorkQueues
 {
 
+	/** The urls db. */
 	protected Database urlsDB = null;
+
+	/** The env. */
 	protected Environment env;
 
+	/** The resumable. */
 	private boolean resumable;
+
+	/** The db name. */
 	private String dbName;
 
+	/** The web url binding. */
 	private WebURLTupleBinding webURLBinding;
 
+	/** The mutex. */
 	protected Object mutex = "WorkQueues_Mutex";
 
+	/**
+	 * Instantiates a new work queues.
+	 * 
+	 * @param env
+	 *            the env
+	 * @param dbName
+	 *            the db name
+	 * @param resumable
+	 *            the resumable
+	 * @throws DatabaseException
+	 *             the database exception
+	 */
 	public WorkQueues(Environment env, String dbName, boolean resumable) throws DatabaseException
 	{
 		this.env = env;
@@ -62,6 +85,15 @@ public class WorkQueues
 		webURLBinding = new WebURLTupleBinding();
 	}
 
+	/**
+	 * Gets the.
+	 * 
+	 * @param max
+	 *            the max
+	 * @return the list
+	 * @throws DatabaseException
+	 *             the database exception
+	 */
 	public List<WebURL> get(int max) throws DatabaseException
 	{
 		synchronized (mutex)
@@ -122,6 +154,14 @@ public class WorkQueues
 		}
 	}
 
+	/**
+	 * Delete.
+	 * 
+	 * @param count
+	 *            the count
+	 * @throws DatabaseException
+	 *             the database exception
+	 */
 	public void delete(int count) throws DatabaseException
 	{
 		synchronized (mutex)
@@ -176,6 +216,14 @@ public class WorkQueues
 		}
 	}
 
+	/**
+	 * Put.
+	 * 
+	 * @param curi
+	 *            the curi
+	 * @throws DatabaseException
+	 *             the database exception
+	 */
 	public void put(WebURL curi) throws DatabaseException
 	{
 		byte[] keyData = Util.int2ByteArray(curi.getDocid());
@@ -197,6 +245,11 @@ public class WorkQueues
 		}
 	}
 
+	/**
+	 * Gets the length.
+	 * 
+	 * @return the length
+	 */
 	public long getLength()
 	{
 		try
@@ -210,6 +263,9 @@ public class WorkQueues
 		return -1;
 	}
 
+	/**
+	 * Sync.
+	 */
 	public void sync()
 	{
 		if (resumable)
@@ -230,13 +286,16 @@ public class WorkQueues
 		}
 	}
 
+	/**
+	 * Close.
+	 */
 	public void close()
 	{
 		try
 		{
 			urlsDB.close();
 			Environment env = urlsDB.getEnvironment();
-			
+
 			Transaction txn = env.beginTransaction(null, null);
 
 			long truncated = env.truncateDatabase(txn, dbName, true);

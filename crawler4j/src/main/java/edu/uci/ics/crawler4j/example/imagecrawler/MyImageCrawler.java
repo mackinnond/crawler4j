@@ -25,68 +25,101 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 import edu.uci.ics.crawler4j.util.IO;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class MyImageCrawler.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
 /*
- * This class shows how you can crawl images on the web and store them in a
- * folder. This is just for demonstration purposes and doesn't scale for large
- * number of images. For crawling millions of images you would need to store
+ * This class shows how you can crawl images on the web and store them in a folder. This is just for demonstration
+ * purposes and doesn't scale for large number of images. For crawling millions of images you would need to store
  * downloaded images in a hierarchy of folders
  * 
- * IMPORTANT: Make sure that you update crawler4j.properties file and 
- *            set crawler.include_images to true
+ * IMPORTANT: Make sure that you update crawler4j.properties file and set crawler.include_images to true
  */
-public class MyImageCrawler extends WebCrawler {
+public class MyImageCrawler extends WebCrawler
+{
 
-	private static final Pattern filters = Pattern
-			.compile(".*(\\.(css|js|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf"
-					+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	/** The Constant filters. */
+	private static final Pattern filters = Pattern.compile(".*(\\.(css|js|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf"
+			+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 
-	private static final Pattern imgPatterns = Pattern
-			.compile(".*(\\.(bmp|gif|jpe?g|png|tiff?))$");
+	/** The Constant imgPatterns. */
+	private static final Pattern imgPatterns = Pattern.compile(".*(\\.(bmp|gif|jpe?g|png|tiff?))$");
 
+	/** The storage folder. */
 	private static File storageFolder;
+
+	/** The crawl domains. */
 	private static String[] crawlDomains;
 
-	public static void configure(String[] crawlDomains, String storageFolderName) {
+	/**
+	 * Configure.
+	 * 
+	 * @param crawlDomains
+	 *            the crawl domains
+	 * @param storageFolderName
+	 *            the storage folder name
+	 */
+	public static void configure(String[] crawlDomains, String storageFolderName)
+	{
 		MyImageCrawler.crawlDomains = crawlDomains;
 
 		storageFolder = new File(storageFolderName);
-		if (!storageFolder.exists()) {
+		if (!storageFolder.exists())
+		{
 			storageFolder.mkdirs();
 		}
 	}
 
-	public boolean shouldVisit(WebURL url) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#shouldVisit(edu.uci.ics.crawler4j.url.WebURL)
+	 */
+	public boolean shouldVisit(WebURL url)
+	{
 		String href = url.getURL().toLowerCase();
-		if (filters.matcher(href).matches()) {
+		if (filters.matcher(href).matches())
+		{
 			return false;
 		}
-		
-		if (imgPatterns.matcher(href).matches()) {
+
+		if (imgPatterns.matcher(href).matches())
+		{
 			return true;
 		}
 
-		for (String domain : crawlDomains) {
-			if (href.startsWith(domain)) {
+		for (String domain : crawlDomains)
+		{
+			if (href.startsWith(domain))
+			{
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public void visit(Page page) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#visit(edu.uci.ics.crawler4j.crawler.Page)
+	 */
+	public void visit(Page page)
+	{
 		String url = page.getWebURL().getURL();
 
 		// We are only interested in processing images
-		if (!page.isBinary() || !imgPatterns.matcher(url).matches()) {
+		if (!page.isBinary() || !imgPatterns.matcher(url).matches())
+		{
 			return;
 		}
-		
+
 		// Not interested in very small images
-		if (page.getBinaryData().length < 10 * 1024) {
+		if (page.getBinaryData().length < 10 * 1024)
+		{
 			return;
 		}
 
@@ -95,9 +128,7 @@ public class MyImageCrawler extends WebCrawler {
 		String hashedName = Cryptography.MD5(url) + extension;
 
 		// store image
-		IO.writeBytesToFile(page.getBinaryData(), storageFolder
-				.getAbsolutePath()
-				+ "/" + hashedName);
+		IO.writeBytesToFile(page.getBinaryData(), storageFolder.getAbsolutePath() + "/" + hashedName);
 
 		System.out.println("Stored: " + url);
 	}

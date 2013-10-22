@@ -27,80 +27,141 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class WebCrawler.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
 public class WebCrawler implements Runnable
 {
 
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(WebCrawler.class.getName());
 
+	/** The my thread. */
 	private Thread myThread;
 
+	/** The Constant PROCESS_OK. */
 	private final static int PROCESS_OK = -12;
 
+	/** The html parser. */
 	private HTMLParser htmlParser;
 
+	/** The myid. */
 	int myid;
 
+	/** The my controller. */
 	private CrawlController myController;
 
+	/** The max crawl depth. */
 	private static short MAX_CRAWL_DEPTH = Configurations.getShortProperty("crawler.max_depth", (short) -1);
+
+	/** The ignore binary content. */
 	private static boolean IGNORE_BINARY_CONTENT = !Configurations.getBooleanProperty("crawler.include_binary_content",
 			false);
+
+	/** The Constant FOLLOW_REDIRECTS. */
 	private static final boolean FOLLOW_REDIRECTS = Configurations.getBooleanProperty("fetcher.follow_redirects", true);
 
+	/**
+	 * Gets the my controller.
+	 * 
+	 * @return the my controller
+	 */
 	public CrawlController getMyController()
 	{
 		return myController;
 	}
 
+	/**
+	 * Sets the my controller.
+	 * 
+	 * @param myController
+	 *            the new my controller
+	 */
 	public void setMyController(CrawlController myController)
 	{
 		this.myController = myController;
 	}
 
+	/**
+	 * Instantiates a new web crawler.
+	 */
 	public WebCrawler()
 	{
 		htmlParser = new HTMLParser();
 	}
 
+	/**
+	 * Instantiates a new web crawler.
+	 * 
+	 * @param myid
+	 *            the myid
+	 */
 	public WebCrawler(int myid)
 	{
 		this.myid = myid;
 	}
 
+	/**
+	 * Sets the my id.
+	 * 
+	 * @param myid
+	 *            the new my id
+	 */
 	public void setMyId(int myid)
 	{
 		this.myid = myid;
 	}
 
+	/**
+	 * Gets the my id.
+	 * 
+	 * @return the my id
+	 */
 	public int getMyId()
 	{
 		return myid;
 	}
 
+	/**
+	 * On start.
+	 */
 	public void onStart()
 	{
 
 	}
 
+	/**
+	 * On before exit.
+	 */
 	public void onBeforeExit()
 	{
 
 	}
 
+	/**
+	 * Gets the my local data.
+	 * 
+	 * @return the my local data
+	 */
 	public Object getMyLocalData()
 	{
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run()
 	{
 		logger.info("run() ");
 		onStart();
-		
+
 		while (true)
 		{
 			List<WebURL> assignedURLs = new ArrayList<WebURL>(50);
@@ -138,16 +199,36 @@ public class WebCrawler implements Runnable
 		}
 	}
 
+	/**
+	 * Should visit.
+	 * 
+	 * @param url
+	 *            the url
+	 * @return true, if successful
+	 */
 	public boolean shouldVisit(WebURL url)
 	{
 		return true;
 	}
 
+	/**
+	 * Visit.
+	 * 
+	 * @param page
+	 *            the page
+	 */
 	public void visit(Page page)
 	{
 		// Should be implemented in sub classes
 	}
 
+	/**
+	 * Process page.
+	 * 
+	 * @param curURL
+	 *            the cur url
+	 * @return the int
+	 */
 	private int processPage(WebURL curURL)
 	{
 		logger.info("processPage() " + curURL.getURL());
@@ -178,7 +259,7 @@ public class WebCrawler implements Runnable
 						// Null url so just ignore
 						return PageFetchStatus.PageTooBig;
 					}
-					
+
 					int newdocid = DocIDServer.getDocID(movedToUrl);
 					if (newdocid > 0)
 					{
@@ -271,16 +352,33 @@ public class WebCrawler implements Runnable
 		return PROCESS_OK;
 	}
 
+	/**
+	 * Gets the thread.
+	 * 
+	 * @return the thread
+	 */
 	public Thread getThread()
 	{
 		return myThread;
 	}
 
+	/**
+	 * Sets the thread.
+	 * 
+	 * @param myThread
+	 *            the new thread
+	 */
 	public void setThread(Thread myThread)
 	{
 		this.myThread = myThread;
 	}
 
+	/**
+	 * Sets the maximum crawl depth.
+	 * 
+	 * @param depth
+	 *            the new maximum crawl depth
+	 */
 	public static void setMaximumCrawlDepth(short depth)
 	{
 		MAX_CRAWL_DEPTH = depth;

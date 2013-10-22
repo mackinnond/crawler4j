@@ -24,42 +24,64 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class MyCrawler.
+ * 
  * @author Yasser Ganjisaffar <yganjisa at uci dot edu>
  */
 
-public class MyCrawler extends WebCrawler {
+public class MyCrawler extends WebCrawler
+{
 
-	Pattern filters = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g"
-			+ "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf"
-			+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	/** The filters. */
+	Pattern filters = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4"
+			+ "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 
-	public MyCrawler() {
+	/**
+	 * Instantiates a new my crawler.
+	 */
+	public MyCrawler()
+	{
 	}
 
-	public boolean shouldVisit(WebURL url) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#shouldVisit(edu.uci.ics.crawler4j.url.WebURL)
+	 */
+	public boolean shouldVisit(WebURL url)
+	{
 		String href = url.getURL().toLowerCase();
-		if (filters.matcher(href).matches()) {
+		if (filters.matcher(href).matches())
+		{
 			return false;
 		}
-		if (href.startsWith("http://www.ics.uci.edu/")) {
+		if (href.startsWith("http://www.ics.uci.edu/"))
+		{
 			return true;
 		}
 		return false;
 	}
-	
-	public void visit(Page page) {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#visit(edu.uci.ics.crawler4j.crawler.Page)
+	 */
+	public void visit(Page page)
+	{
 		int docid = page.getWebURL().getDocid();
-        String url = page.getWebURL().getURL();         
-        String text = page.getText();
-        List<WebURL> links = page.getURLs();
+		String url = page.getWebURL().getURL();
+		String text = page.getText();
+		List<WebURL> links = page.getURLs();
 		int parentDocid = page.getWebURL().getParentDocid();
-		
+
 		System.out.println("Docid: " + docid);
 		System.out.println("URL: " + url);
 		System.out.println("Text length: " + text.length());
 		System.out.println("Number of links: " + links.size());
 		System.out.println("Docid of parent page: " + parentDocid);
 		System.out.println("=============");
-	}	
+	}
 }

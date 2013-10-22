@@ -31,14 +31,14 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class MyCrawler extends WebCrawler
 {
-	
+
 	/** The base url. */
 	private String baseUrl;
 
 	/** The Constant FILTERS. */
 	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|doc|js|bmp|gif|jpe?g"
 			+ "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-	
+
 	/** The my crawl stat. */
 	CrawlStat myCrawlStat;
 
@@ -50,7 +50,9 @@ public class MyCrawler extends WebCrawler
 		myCrawlStat = new CrawlStat();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#shouldVisit(edu.uci.ics.crawler4j.url.WebURL)
 	 */
 	public boolean shouldVisit(WebURL url)
@@ -107,7 +109,9 @@ public class MyCrawler extends WebCrawler
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#visit(edu.uci.ics.crawler4j.crawler.Page)
 	 */
 	public void visit(Page page)
@@ -147,7 +151,9 @@ public class MyCrawler extends WebCrawler
 	}
 
 	// This function is called by controller to get the local data of this crawler when job is finished
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#getMyLocalData()
 	 */
 	public Object getMyLocalData()
@@ -157,7 +163,9 @@ public class MyCrawler extends WebCrawler
 
 	// This function is called by controller before finishing the job.
 	// You can put whatever stuff you need here.
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.uci.ics.crawler4j.crawler.WebCrawler#onBeforeExit()
 	 */
 	public void onBeforeExit()
