@@ -73,7 +73,7 @@ public class CrawlerTest
 				allPageText.append(crawlStat.getTextBuff().toString());
 			}
 
-			//System.out.println("All text : " + allPageText.toString());
+			System.out.println("All text : " + allPageText.toString());
 			System.out.println("All text size: " + allPageText.toString().length());
 		}
 		catch (Exception e)

@@ -128,7 +128,7 @@ public class MyCrawler extends WebCrawler
 		System.out.println("\t Docid of parent page: " + parentDocid);
 		String text = page.getText();
 
-		String html = page.getHTML();
+		//String html = page.getHTML();
 
 		myCrawlStat.getTextBuff().append(text + "\n ");
 		myCrawlStat.getTextBuff().append("========\n ");
