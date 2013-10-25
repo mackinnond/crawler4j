@@ -43,7 +43,8 @@ public class CrawlerTest
 		// String baseUrl = "http://www.fiat.co.uk/‎";
 		// String baseUrl = "http://www.zangbezang.com/";
 		//String baseUrl = "http://www.audi.com/";
-		String baseUrl = "http://www.bmw.com/";
+		String baseUrl = "http://www.spark-online.com/august00/media/romano.html";
+		//String baseUrl = "http://www.bmw.com/";
 		//String baseUrl = "http://www.citroen.co.uk/";
 		int maxDepth = 10;
 		int maxPagesToFetch = 100;
