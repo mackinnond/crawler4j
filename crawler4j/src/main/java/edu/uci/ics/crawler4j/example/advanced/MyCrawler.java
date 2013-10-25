@@ -32,15 +32,13 @@ import edu.uci.ics.crawler4j.url.WebURL;
 public class MyCrawler extends WebCrawler
 {
 
-	/** The base url. */
-	private String baseUrl;
-
 	/** The Constant FILTERS. */
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|doc|js|bmp|gif|jpe?g"
+	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|cgi|doc|js|bmp|gif|jpe?g"
 			+ "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 
 	/** The my crawl stat. */
-	CrawlStat myCrawlStat;
+	private CrawlStat myCrawlStat;
+	private static final String HTTP = "http://";
 
 	/**
 	 * Instantiates a new my crawler.
@@ -70,39 +68,25 @@ public class MyCrawler extends WebCrawler
 		String href = url.getURL().toLowerCase();
 
 		// Save base Url and check that we have not left site...
-		if (baseUrl == null)
+		if (!href.contains(this.getMyController().getBaseUrl()))
 		{
-			int lastPos = href.indexOf("//") + 2;
-			lastPos = href.indexOf("/", lastPos);
-			if (lastPos == -1)
-			{
-				baseUrl = href;
-			}
-			else
-			{
-				baseUrl = href.substring(0, lastPos);
-			}
-		}
-
-		if (!href.startsWith(baseUrl))
-		{
-			System.out.println("Excluded external site  : " + href);
+			// System.out.println("Excluded external site  : " + href);
 			return false;
 		}
 
 		if (FILTERS.matcher(href).matches())
 		{
-			System.out.println("Exclude : " + href);
+			// System.out.println("Exclude : " + href);
 			return false;
 		}
 		if (href.contains(".ico"))
 		{
-			System.out.println("Exclude : " + href);
+			// System.out.println("Exclude : " + href);
 			return false;
 		}
 		else if (href.contains(".css"))
 		{
-			System.out.println("Exclude : " + href);
+			// System.out.println("Exclude : " + href);
 			return false;
 		}
 		System.out.println("Include : " + href);
@@ -122,13 +106,20 @@ public class MyCrawler extends WebCrawler
 
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();
+		
+		if (!url.contains(this.getMyController().getBaseUrl()))
+		{
+			System.out.println("ERROR : invalid url: " + url + " for base : " +  this.getMyController().getBaseUrl());
+			return;
+		}
+
 		int parentDocid = page.getWebURL().getParentDocid();
 		System.out.println("\t Docid: " + docid);
 		System.out.println("\t URL: " + url);
 		System.out.println("\t Docid of parent page: " + parentDocid);
 		String text = page.getText();
 
-		//String html = page.getHTML();
+		// String html = page.getHTML();
 
 		myCrawlStat.getTextBuff().append(text + "\n ");
 		myCrawlStat.getTextBuff().append("========\n ");

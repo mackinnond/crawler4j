@@ -55,6 +55,9 @@ public final class CrawlController
 	/** The crawlers local data. */
 	private List<Object> crawlersLocalData = new ArrayList<Object>();
 
+	/** The base url to start crawling from. */
+	private String baseUrl;
+	
 	/**
 	 * Gets the crawlers local data.
 	 * 
@@ -364,6 +367,35 @@ public final class CrawlController
 		{
 			Frontier.schedule(webUrl);
 		}
+		
+		saveBaseUrl(pageUrl);
+
+	}
+
+	/**
+	 * Save base url.
+	 *
+	 * @param pageUrl the page url
+	 */
+	private void saveBaseUrl(String pageUrl)
+	{
+		int lastPos = pageUrl.indexOf("//") + 2;
+		lastPos = pageUrl.indexOf("/", lastPos);
+		if (lastPos == -1)
+		{
+			baseUrl = pageUrl;
+		}
+		else
+		{
+			baseUrl = pageUrl.substring(0, lastPos);
+			int pos = baseUrl.indexOf(".");
+			if (pos > 0)
+			{
+				baseUrl = baseUrl.substring(pos + 1, baseUrl.length() );
+			}
+
+		}
+		logger.info("baseUrl =: " + baseUrl);
 	}
 
 	/**
@@ -445,6 +477,16 @@ public final class CrawlController
 	public static void setProxy(String proxyHost, int proxyPort, String username, String password)
 	{
 		PageFetcher.setProxy(proxyHost, proxyPort, username, password);
+	}
+
+	/**
+	 * Gets the base url.
+	 *
+	 * @return the base url
+	 */
+	public String getBaseUrl()
+	{
+		return baseUrl;
 	}
 
 }
