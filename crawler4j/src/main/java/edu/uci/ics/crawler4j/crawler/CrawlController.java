@@ -18,6 +18,7 @@
 package edu.uci.ics.crawler4j.crawler;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.lang.Thread.State;
 import java.util.ArrayList;
@@ -57,7 +58,9 @@ public final class CrawlController
 
 	/** The base url to start crawling from. */
 	private String baseUrl;
-	
+
+	private static boolean frontierDirDeleted = false;
+
 	/**
 	 * Gets the crawlers local data.
 	 * 
@@ -96,7 +99,7 @@ public final class CrawlController
 	 */
 	public CrawlController(String storageFolder, boolean resumable) throws Exception
 	{
-		FileUtils.deleteDirectory(new File(storageFolder + "/frontier"));
+		deleteFrontierDb(storageFolder);
 
 		File folder = new File(storageFolder);
 		if (!folder.exists())
@@ -126,6 +129,17 @@ public final class CrawlController
 		DocIDServer.init(env, resumable);
 
 		PageFetcher.startConnectionMonitorThread();
+	}
+
+	private synchronized void deleteFrontierDb(String storageFolder) throws IOException
+	{
+		if (!frontierDirDeleted)
+		{
+			File frontierDb = new File(storageFolder + "/frontier");
+			logger.info("Deleting : " + frontierDb.getAbsolutePath());
+			FileUtils.deleteDirectory(frontierDb);
+			frontierDirDeleted = true;			
+		}
 	}
 
 	/**
@@ -239,17 +253,13 @@ public final class CrawlController
 							e.printStackTrace();
 						}
 
-						for (int i = 0; i < threads.size(); i++)
-						{
-							Thread thread = threads.get(i);
-							logger.info("Thread state5 = " + thread.getState().toString());
-							if (thread.isAlive())
-							{
-								logger.info("Wait for live thread to die");
-								thread.join();
-							}
-
-						}
+						/*
+						 * for (int i = 0; i < threads.size(); i++) { Thread thread = threads.get(i);
+						 * logger.info("Thread state = " + thread.getState().toString()); if (thread.isAlive()) {
+						 * logger.info("Wait for live thread to die"); thread.join(); }
+						 * 
+						 * }
+						 */
 						// PageFetcher.stopConnectionMonitorThread();
 						return;
 					}
@@ -367,15 +377,16 @@ public final class CrawlController
 		{
 			Frontier.schedule(webUrl);
 		}
-		
+
 		saveBaseUrl(pageUrl);
 
 	}
 
 	/**
 	 * Save base url.
-	 *
-	 * @param pageUrl the page url
+	 * 
+	 * @param pageUrl
+	 *            the page url
 	 */
 	private void saveBaseUrl(String pageUrl)
 	{
@@ -391,7 +402,7 @@ public final class CrawlController
 			int pos = baseUrl.indexOf(".");
 			if (pos > 0)
 			{
-				baseUrl = baseUrl.substring(pos + 1, baseUrl.length() );
+				baseUrl = baseUrl.substring(pos + 1, baseUrl.length());
 			}
 
 		}
@@ -481,7 +492,7 @@ public final class CrawlController
 
 	/**
 	 * Gets the base url.
-	 *
+	 * 
 	 * @return the base url
 	 */
 	public String getBaseUrl()
