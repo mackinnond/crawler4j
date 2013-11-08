@@ -60,6 +60,7 @@ public final class CrawlController
 	private String baseUrl;
 
 	private static boolean frontierDirDeleted = false;
+	private static final int DELAY = 20;
 
 	/**
 	 * Gets the crawlers local data.
@@ -138,7 +139,7 @@ public final class CrawlController
 			File frontierDb = new File(storageFolder + "/frontier");
 			logger.info("Deleting : " + frontierDb.getAbsolutePath());
 			FileUtils.deleteDirectory(frontierDb);
-			frontierDirDeleted = true;			
+			frontierDirDeleted = true;
 		}
 	}
 
@@ -179,7 +180,7 @@ public final class CrawlController
 
 			while (true)
 			{
-				sleep(10);
+				sleep(DELAY);
 				boolean someoneIsWorking = false;
 
 				for (int i = 0; i < threads.size(); i++)
@@ -210,8 +211,8 @@ public final class CrawlController
 				if (!someoneIsWorking)
 				{
 					// Make sure again that none of the threads are alive.
-					logger.info("It looks like no thread is working, waiting for 1 second to make sure...");
-					sleep(1);
+					logger.info("It looks like no thread is working, waiting for 20 second to make sure...");
+					sleep(DELAY);
 
 					if (!isAnyThreadWorking())
 					{
@@ -220,8 +221,8 @@ public final class CrawlController
 						{
 							continue;
 						}
-						logger.info("No thread is working and no more URLs are in queue waiting for another 1 second to make sure...");
-						sleep(1);
+						logger.info("No thread is working and no more URLs are in queue waiting for another 20 second to make sure...");
+						sleep(DELAY);
 						queueLength = Frontier.getQueueLength();
 						if (queueLength > 0)
 						{
@@ -239,7 +240,7 @@ public final class CrawlController
 						// We will wait a few seconds for them and then return.
 						Frontier.finish();
 						logger.info("Waiting for 1 second before final clean up...");
-						sleep(1);
+						sleep(DELAY);
 
 						try
 						{
@@ -319,8 +320,10 @@ public final class CrawlController
 		{
 			Thread.sleep(seconds * 1000);
 		}
-		catch (Exception e)
+		catch (InterruptedException e)
 		{
+			// We've been interrupted: no more messages.
+			return;
 		}
 	}
 
